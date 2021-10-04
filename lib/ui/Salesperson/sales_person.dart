@@ -19,6 +19,7 @@ class SalesPerson extends StatefulWidget {
 
 class _SalesPerson extends State<SalesPerson> {
   UserData userData;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -94,29 +95,35 @@ class _SalesPerson extends State<SalesPerson> {
                       ),
                       cardWidget('كشف حساب العملاء',
                           'assets/images/Group_498.png', false, 'summary', 0),
+                      if (userData?.role_id == 1)
+                        cardWidget('فاتورة شراء', 'assets/images/Group_498.png',
+                            true, 'buy', 50),
                       if (userData?.role_id == 4 || userData?.role_id == 1)
-                        cardWidget('فاتورة', 'assets/images/Group_498.png',
-                            true, 'invoice', 50),
+                        cardWidget('فاتورة بيع', 'assets/images/Group_498.png',
+                            false, 'invoice', 100),
 //                      cardWidget('تحويل مخزون', 'assets/images/Group_595.png',
 //                          false, 'return_store', 100),
 //                      cardWidget('مرتـــجع', 'assets/images/Group_681.png',
 //                          true, 'returns', 150),
                       if (userData?.role_id == 4 || userData?.role_id == 1)
                         cardWidget('رصيد مستودع', 'assets/images/Group_681.png',
-                            false, 'productReport', 100),
-                      if (userData?.role_id == 4 || userData?.role_id == 1)
+                            true, 'productReport', 150),
+                      if (userData?.role_id == 1)
                         cardWidget('إضافة عميل ', 'assets/images/customer.jpg',
-                            true, 'addCustomer', 150),
-                      if (userData?.role_id == 4 || userData?.role_id == 1)
+                            false, 'addCustomer', 200),
+                      if (userData?.role_id == 1)
                         cardWidget('إضافة مورد ', 'assets/images/supplier.png',
-                            false, 'addSupplier', 200),
-                      if (userData?.role_id == 4 || userData?.role_id == 1)
+                            true, 'addSupplier', 250),
+                      if (userData?.role_id == 1)
                         cardWidget(
                             'إضافة مصروفات ',
                             'assets/images/expense.png',
-                            true,
+                            false,
                             'addExpense',
-                            250),
+                            300),
+                      if (userData?.role_id == 1)
+                        cardWidget('إضافة صنف ', 'assets/images/product.jpg',
+                            true, 'addProduct', 350),
                     ],
                   ),
                 ),

@@ -9,36 +9,35 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
-import 'package:raid/model/Customers.dart';
+import 'package:raid/model/NewModels.dart';
 import 'package:raid/model/ProductData.dart';
 import 'package:raid/provider/PostProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
+import 'package:raid/ui/Salesperson/sales_person.dart';
 
-import 'sales_person.dart';
-
-class PreviewPage extends StatefulWidget {
+class SupPreviewPage extends StatefulWidget {
   final List<CartItem> cart;
   final double shipping;
   final double discount;
-  final CustomersData customerData;
+  final SuppliersData customerData;
   final double total;
-  final int wareHouse;
-  const PreviewPage(
+  final int warId;
+  const SupPreviewPage(
       {Key key,
       this.cart,
       this.shipping,
       this.discount,
       this.customerData,
       this.total,
-      this.wareHouse})
+      this.warId})
       : super(key: key);
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<PreviewPage> {
+class _SearchPageState extends State<SupPreviewPage> {
   // data
-  List<String> saleStatus = ['غير مكتمل', 'مكتمل'];
+  List<String> saleStatus = ['مستلم', 'جزئى', 'معلق', 'تم الطلب'];
   List<String> paymentStatus = ['معلق', 'مؤجل', 'جزئى', 'مدفوع'];
   int paymentIndex = 0, saleIndex = 0;
   List<double> qty = [];
@@ -121,7 +120,7 @@ class _SearchPageState extends State<PreviewPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('فاتورة بإســم:  ',
+                  Text('اســم المـورد:  ',
                       style: TextStyle(
                           fontSize: 22.0,
                           fontFamily: GoogleFonts.cairo().fontFamily,
@@ -286,13 +285,13 @@ class _SearchPageState extends State<PreviewPage> {
                               isLoading = true;
                             });
                             var data = {
-                              'customer_id': '${widget.customerData.id}',
+                              'supplier_id': '${widget.customerData.id}',
+                              'warehouse_id': '${widget.warId}',
                               'qty': json.encode(qty),
-                              'warehouse_id': '${widget.wareHouse}',
-                              'product_code': json.encode(pcode),
+                              'product_code': "$pcode",
                               'product_id': json.encode(pid),
-                              'sale_unit': json.encode(saleunit),
-                              'net_unit_price': json.encode(netunitprice),
+                              'purchase_unit': json.encode(saleunit),
+                              'net_unit_cost': json.encode(netunitprice),
                               'discount': json.encode(discount),
                               'tax_rate': json.encode(taxrate),
                               'tax': json.encode(tax),
@@ -300,28 +299,26 @@ class _SearchPageState extends State<PreviewPage> {
                               'total_discount': '$totaldiscount',
                               'total_tax': '$totaltax',
                               "total_qty": '$totalqty',
-                              'total_price': '$totalprice',
+                              'total_cost': '$totalprice',
                               'item': '${widget.cart.length}',
                               'order_tax': '$ordertax',
                               'grand_total': '${widget.total}',
-                              'pos': '0',
-                              'coupon_active': '0',
                               'order_tax_rate': '0',
                               'order_discount': '0',
                               'shipping_cost': '${widget.shipping}',
-                              'sale_status': '$saleIndex',
+                              'status': '${saleIndex + 1}',
                               'payment_status': '$paymentIndex',
                               'paid_by_id': '${widget.customerData.id}',
-                              'paying_amount': '${payingamount}',
                               'paid_amount': '$paidamount',
-                              'payment_note': '',
-                              'sale_note': '',
-                              'staff_note': ''
+                              "recieved": json.encode(qty),
+                              //"batch_no": jsonEncode([]),
+                              // "expired_date": jsonEncode([]),
+                              'note': ''
                             };
                             print('data is $data');
                             await Provider.of<PostProvider>(context,
                                     listen: false)
-                                .addsale(data)
+                                .addPurchase(data)
                                 .then((value) {
                               setState(() {
                                 isLoading = false;

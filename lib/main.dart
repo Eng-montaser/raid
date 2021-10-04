@@ -18,6 +18,8 @@ import 'package:raid/ui/Salesperson/returns_store.dart';
 import 'package:raid/ui/Salesperson/sales_person.dart';
 import 'package:raid/ui/admin/addCustomer.dart';
 import 'package:raid/ui/admin/addExpenses.dart';
+import 'package:raid/ui/admin/addProduct.dart';
+import 'package:raid/ui/admin/sup_invoice.dart';
 import 'package:raid/ui/auth_page.dart';
 import 'package:raid/ui/matches.dart';
 import 'package:raid/ui/onboard.dart';
@@ -109,10 +111,12 @@ class MyApp extends StatelessWidget {
                 'profile': (context) => Profile(),
                 'summary': (context) => Summary(),
                 'invoice': (context) => Invoice(),
+                'buy': (context) => SupInvoice(),
                 'productReport': (context) => ProductReport(),
                 'addExpense': (context) => AddExpense(),
                 'addCustomer': (context) => AddCustomer(),
                 'addSupplier': (context) => AddSupplier(),
+                'addProduct': (context) => AddProduct(),
               },
             ),
           );

@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:raid/model/NewModels.dart';
 import 'package:raid/model/ProductReportData.dart';
+import 'package:raid/model/UserData.dart';
+import 'package:raid/provider/AuthProvider.dart';
 import 'package:raid/provider/GetProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
 import 'package:raid/widget/rounded_input_field.dart';
@@ -19,37 +24,59 @@ class ProductReport extends StatefulWidget {
   _ProductReportState createState() => _ProductReportState();
 }
 
-List<ProductReportData> _productReportsData, temp;
-ProductReportDataSource _productReportDataSource;
-
 class _ProductReportState extends State<ProductReport> {
+  List<ProductReportData> temp;
+  ProductReportDataList _productReportsDataList;
+  ProductReportDataSource _productReportDataSource;
+  List<WarehousesData> _warehousesDataList;
+  UserData userData;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      userData =
+          await Provider.of<AuthProvider>(context, listen: false).userData;
       await Provider.of<GetProvider>(context, listen: false)
-          .getStocksReports(
-              DateFormat('yyyy-MM-dd').format(_startDate).toString(),
-              DateFormat('yyyy-MM-dd').format(_endDate).toString())
+          .getWarehousesData()
           .then((value) {
-        print(value.length);
+        value.forEach((element) {
+          print(element.wId);
+        });
         setState(() {
-          _productReportsData = temp = value;
-          _productReportDataSource = ProductReportDataSource();
+          _warehousesDataList = value;
         });
       });
     });
-    _searchController.addListener(() {
-      _productReportsData = temp
-          .where((element) => element.name.contains(_searchController.text))
-          .toList();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<GetProvider>(context, listen: false)
+          .getStocksReports(
+              DateFormat('yyyy-MM-dd').format(_startDate).toString(),
+              DateFormat('yyyy-MM-dd').format(_endDate).toString(),
+              1,
+              _warehouse.wId)
+          .then((value) {
+        setState(() {
+          _productReportsDataList = value;
+          populateData();
+        });
+      });
     });
+//    _searchController.addListener(() {
+//      if(temp!=null)
+//      _productReportsDataList.productReportDataList = temp
+//          .where((element) => element.name.contains(_searchController.text))
+//          .toList();
+//    });
 //    populateData();
   }
 
+  ScrollController _scrollController;
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
+  WarehousesData _warehouse = new WarehousesData(name: 'الكل', wId: 1);
   TextEditingController _searchController = new TextEditingController(text: '');
+  bool _loadMoreLoading = false;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -84,8 +111,10 @@ class _ProductReportState extends State<ProductReport> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          //mainAxisSize: MainAxisSize.max,
           children: [
+            ///---------------------------------
+            ///      Search
+            ///---------------------------------
             Container(
               margin:
                   EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(50)),
@@ -98,11 +127,11 @@ class _ProductReportState extends State<ProductReport> {
             ),
 
             ///---------------------------------
-            ///select range of date
+            ///      select range of date
             ///---------------------------------
             Container(
               padding:
-                  EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(10)),
+                  EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(2)),
               width: size.width * 4 / 5,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -112,250 +141,478 @@ class _ProductReportState extends State<ProductReport> {
                     "اختر التاريخ من",
                     style: FCITextStyle().normal16(),
                   ),
-                  Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(5)),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Color(0xfff1f1f1), width: 2),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil().setWidth(10)),
-                      child: InkWell(
-                          onTap: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2020, 1, 1),
-                                maxTime: DateTime(2050, 12, 30),
-                                onChanged: (date) {}, onConfirm: (date) async {
-                              _startDate = date;
-                              await populateData();
-                            },
-                                currentTime: _startDate != null
-                                    ? _startDate
-                                    : DateTime.now(),
-                                locale: LocaleType.ar);
-                          },
-                          child: Text(
-                            DateFormat('yyyy-MM-dd')
-                                .format(_startDate)
-                                .toString(),
-                            style: FCITextStyle().normal16(),
-                          ))),
+                  InkWell(
+                    onTap: () {
+                      DatePicker.showDatePicker(context,
+                          showTitleActions: true,
+                          minTime: DateTime(2020, 1, 1),
+                          maxTime: DateTime(2050, 12, 30),
+                          onChanged: (date) {}, onConfirm: (date) async {
+                        _startDate = date;
+                        setData();
+                      },
+                          currentTime:
+                              _startDate != null ? _startDate : DateTime.now(),
+                          locale: LocaleType.ar);
+                    },
+                    child: Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: ScreenUtil().setHeight(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border:
+                              Border.all(color: Color(0xfff1f1f1), width: 2),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil().setWidth(10)),
+                        child: Text(
+                          DateFormat('yyyy-MM-dd')
+                              .format(_startDate)
+                              .toString(),
+                          style: FCITextStyle().normal16(),
+                        )),
+                  ),
                   Text(
                     "الى",
                     style: FCITextStyle().normal16(),
                   ),
-                  Container(
-                      margin: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(5)),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Color(0xfff1f1f1), width: 2),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil().setWidth(10)),
-                      child: InkWell(
-                          onTap: () {
-                            DatePicker.showDatePicker(context,
-                                showTitleActions: true,
-                                minTime: DateTime(2021, 1, 1),
-                                maxTime: DateTime(2050, 12, 30),
-                                onChanged: (date) {}, onConfirm: (date) async {
-                              _endDate = date;
-                              await populateData();
-                            },
-                                currentTime: _endDate != null
-                                    ? _endDate
-                                    : DateTime.now(),
-                                locale: LocaleType.ar);
-                          },
-                          child: Text(
-                            DateFormat('yyyy-MM-dd')
-                                .format(_endDate)
-                                .toString(),
-                            style: FCITextStyle().normal16(),
-                          )))
+                  InkWell(
+                    onTap: () {
+                      DatePicker.showDatePicker(context,
+                          showTitleActions: true,
+                          minTime: DateTime(2021, 1, 1),
+                          maxTime: DateTime(2050, 12, 30),
+                          onChanged: (date) {}, onConfirm: (date) async {
+                        _endDate = date;
+                        setData();
+                      },
+                          currentTime:
+                              _endDate != null ? _endDate : DateTime.now(),
+                          locale: LocaleType.ar);
+                    },
+                    child: Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: ScreenUtil().setHeight(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border:
+                              Border.all(color: Color(0xfff1f1f1), width: 2),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil().setWidth(10)),
+                        child: Text(
+                          DateFormat('yyyy-MM-dd').format(_endDate).toString(),
+                          style: FCITextStyle().normal16(),
+                        )),
+                  )
                 ],
               ),
             ),
+
+            ///---------------------------------
+            ///      WarHouse
+            ///---------------------------------
+            if (userData?.role_id == 1)
+              Container(
+                padding:
+                    EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(3)),
+                width: size.width * 4 / 5,
+                child: Row(
+                  children: [
+                    Text(
+                      "اختر المستودع ",
+                      style: FCITextStyle().normal16(),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        modalBottomSheetMenu(
+                            context: context,
+                            data: _warehousesDataList,
+                            vacationName: (name) {
+                              setState(() {
+                                _warehouse.name = name;
+                              });
+                            },
+                            vacationId: (mall_id) {
+                              setState(() {
+                                _warehouse.wId = mall_id;
+                              });
+                              setData();
+                            });
+                      },
+                      child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: ScreenUtil().setHeight(3),
+                              horizontal: ScreenUtil().setWidth(5)),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border:
+                                Border.all(color: Color(0xfff1f1f1), width: 2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ScreenUtil().setWidth(10)),
+                          width: ScreenUtil().setWidth(250),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _warehouse.name,
+                            style: FCITextStyle(color: Colors.black).normal16(),
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+
+            ///---------------------------------
+            ///      Table of date
+            ///---------------------------------
+//          _productReportsDataList==null? loadingTow(70):  Text(_test),
             Container(
-                height: size.height * 0.70,
+                height: size.height * 0.65,
                 width: size.width,
                 alignment: Alignment.center,
-                child: _productReportsData != null
-                    ? _productReportsData.length != 0
-                        ? SfDataGrid(
-                            source: _productReportDataSource,
-                            columnWidthMode: ColumnWidthMode.auto,
-                            headerCellBuilder: (contex, column) {
-                              return Center(
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration:
-                                      BoxDecoration(color: primaryColor),
-                                  child: Center(
-                                    child: Text(
-                                      '${column.headerText}',
-                                      style: FCITextStyle(color: Colors.white)
-                                          .bold14(),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            gridLinesVisibility: GridLinesVisibility.both,
-                            headerGridLinesVisibility:
-                                GridLinesVisibility.vertical,
-                            headerRowHeight: ScreenUtil().setHeight(60),
-                            rowHeight: ScreenUtil().setHeight(50),
-                            columns: <GridColumn>[
-                              GridTextColumn(
-                                  mappingName: 'name',
-                                  headerText: 'اسم المنتج',
-                                  width: ScreenUtil().setWidth(150),
-                                  maxLines: 3,
-                                  padding: EdgeInsets.symmetric(vertical: 0),
-                                  headerTextAlignment: Alignment.centerRight,
-                                  textAlignment: Alignment.centerRight,
-                                  overflow: TextOverflow.ellipsis),
-                              GridNumericColumn(
-                                  mappingName: 'purchased_amount',
-                                  headerText: 'المبلغ المشترى',
-                                  padding: EdgeInsets.symmetric(vertical: 0),
-                                  textAlignment: Alignment.center,
-                                  headerTextOverflow: TextOverflow.clip),
-                              GridNumericColumn(
-                                mappingName: 'purchased_qty',
-                                headerText: 'الكمية المشتراة',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'sold_amount',
-                                headerText: 'المبلغ المباع',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'sold_qty',
-                                headerText: 'الكمبة المباعة',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'returned_amount',
-                                headerText: 'المبلغ المرتجع',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'returned_qty',
-                                headerText: 'الكمبة المرتجعة',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'purchase_returned_amount',
-                                headerText: 'المبلغ المشترى المرتجع',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'purchase_returned_qty',
-                                headerText: 'الكمية المشتراه المرتجعه ',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                mappingName: 'profit',
-                                headerText: 'ربح',
-                                padding: EdgeInsets.symmetric(vertical: 0),
-                                textAlignment: Alignment.center,
-                              ),
-                              GridNumericColumn(
-                                  mappingName: 'in_stock',
-                                  headerText: 'المخزن',
-                                  padding: EdgeInsets.symmetric(vertical: 0),
-                                  textAlignment: Alignment.center,
-                                  headerTextOverflow: TextOverflow.visible),
-                            ],
+                child: _productReportsDataList != null
+                    ? _productReportsDataList.productReportDataList.length != 0
+                        ? Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ScreenUtil().setWidth(5)),
+                            child: SfDataGrid(
+                              verticalScrollController: _scrollController,
+                              source: _productReportDataSource,
+                              columnWidthMode: ColumnWidthMode.auto,
+                              gridLinesVisibility: GridLinesVisibility.both,
+                              headerGridLinesVisibility:
+                                  GridLinesVisibility.both,
+                              rowHeight: ScreenUtil().setWidth(50),
+//                    headerCellBuilder: (contex, column) {
+//                      return Center(
+//                        child: Container(
+//                          width: double.infinity,
+//                          decoration:
+//                          BoxDecoration(color: primaryColor),
+//                          child: Center(
+//                            child: Text(
+//                              '${column.headerText}',
+//                              style: FCITextStyle(color: Colors.white)
+//                                  .bold14(),
+//                            ),
+//                          ),
+//                        ),
+//                      );
+//                    },
+                              columns: <GridColumn>[
+                                GridTextColumn(
+                                    columnName: 'id',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'م',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'name',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'اسم المنتج',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'purchased_amount',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'المبلغ المشترى',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'purchased_qty',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'الكمية المشتراة',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'sold_amount',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'المبلغ المباع',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'sold_qty',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'الكمبة المباعة',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'returned_amount',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'المبلغ المرتجع',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'returned_qty',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'الكمبة المرتجعة',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'purchase_returned_amount',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'المبلغ المشترى المرتجع',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'purchase_returned_qty',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'الكمية المشتراه المرتجعه',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'profit',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'ربح',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                                GridTextColumn(
+                                    columnName: 'in_stock',
+                                    label: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 0),
+                                        color: primaryColor,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'المخزن',
+                                          style:
+                                              FCITextStyle(color: Colors.white)
+                                                  .bold16(),
+                                        ))),
+                              ],
+                            ),
                           )
                         : Text(
                             'لا يوجد بيانات',
                             style: FCITextStyle().normal18(),
                           )
-                    : loadingTow(100)),
+                    : loadingTow(70)),
+            if (_productReportsDataList !=
+                null) //&& _productReportsDataList.productReportDataList.length<_productReportsDataList.total)
+              Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "عدد ${_productReportsDataList.lastItem}",
+                      style: FCITextStyle().normal16(),
+                    ),
+                    Text(
+                      "من اجمالى ${_productReportsDataList.total}",
+                      style: FCITextStyle().normal16(),
+                    ),
+                    SizedBox(
+                      width: ScreenUtil().setWidth(5),
+                    ),
+                    _loadMoreLoading
+                        ? loadingTow(25)
+                        : _productReportsDataList.productReportDataList.length <
+                                _productReportsDataList.total
+                            ? FlatButton(
+                                child: Text(
+                                  "التالى",
+                                  style: FCITextStyle(color: Colors.blue)
+                                      .normal16(),
+                                ),
+                                onPressed: () {
+                                  loadMoreData();
+                                },
+                              )
+                            : Container(),
+                  ],
+                ),
+              ),
+//              Container(
+//              height: 15,
+//              child: SfDataPager(
+//                delegate: _productReportDataSource,
+//                pageCount: _productReportsData.length/3,
+//                direction: Axis.horizontal,
+//              ),
+//            )
           ],
         ),
       ),
     );
   }
 
-  Future<void> populateData() async {
+  populateData() {
+    _scrollController = new ScrollController();
+
     setState(() {
-      _productReportsData = temp = null;
+      _productReportDataSource = ProductReportDataSource(
+          productData: _productReportsDataList.productReportDataList);
+    });
+  }
+
+  Future<void> setData() async {
+    setState(() {
+      _productReportsDataList = null;
+      temp = null;
     });
     await Provider.of<GetProvider>(context, listen: false)
         .getStocksReports(
             DateFormat('yyyy-MM-dd').format(_startDate).toString(),
-            DateFormat('yyyy-MM-dd').format(_endDate).toString())
+            DateFormat('yyyy-MM-dd').format(_endDate).toString(),
+            1,
+            _warehouse.wId)
         .then((value) {
       setState(() {
-        _productReportsData = temp = value;
-        _productReportDataSource = ProductReportDataSource();
+        _productReportsDataList = value;
       });
+      populateData();
+    });
+  }
+
+  Future<void> loadMoreData() async {
+    setState(() {
+      _loadMoreLoading = true;
+    });
+    await Provider.of<GetProvider>(context, listen: false)
+        .getStocksReports(
+            DateFormat('yyyy-MM-dd').format(_startDate).toString(),
+            DateFormat('yyyy-MM-dd').format(_endDate).toString(),
+            _productReportsDataList.currentPage + 1,
+            _warehouse.wId)
+        .then((value) {
+      setState(() {
+        _productReportsDataList.addNewPage(value);
+        populateData();
+      });
+      Timer(
+        Duration(seconds: 1),
+        () => _scrollController
+            .jumpTo(_scrollController.position.maxScrollExtent),
+      );
+    });
+    setState(() {
+      _loadMoreLoading = false;
     });
   }
 }
 
-class ProductReportDataSource extends DataGridSource<ProductReportData> {
+class ProductReportDataSource extends DataGridSource {
+  List<DataGridRow> _productData = [];
+  ProductReportDataSource({@required List<ProductReportData> productData}) {
+    _productData = productData
+        .map<DataGridRow>((e) => DataGridRow(cells: [
+              DataGridCell<int>(columnName: 'id', value: e.key + 1),
+              DataGridCell<String>(columnName: 'name', value: e.name),
+              DataGridCell<int>(
+                  columnName: 'purchased_amount', value: e.purchased_amount),
+              DataGridCell<int>(
+                  columnName: 'purchased_qty', value: e.purchased_qty),
+              DataGridCell<int>(
+                  columnName: 'sold_amount', value: e.sold_amount),
+              DataGridCell<int>(columnName: 'sold_qty', value: e.sold_qty),
+              DataGridCell<int>(
+                  columnName: 'returned_amount', value: e.returned_amount),
+              DataGridCell<int>(
+                  columnName: 'returned_qty', value: e.returned_qty),
+              DataGridCell<int>(
+                  columnName: 'purchase_returned_amount',
+                  value: e.purchase_returned_amount),
+              DataGridCell<int>(
+                  columnName: 'purchase_returned_qty',
+                  value: e.purchase_returned_qty),
+              DataGridCell<String>(columnName: 'profit', value: e.profit),
+              DataGridCell<int>(columnName: 'in_stock', value: e.in_stock),
+            ]))
+        .toList();
+  }
   @override
-  List<ProductReportData> get dataSource => _productReportsData;
+  List<DataGridRow> get rows => _productData;
 
   @override
-  Object getValue(ProductReportData product, String columnName) {
-    switch (columnName) {
-      case 'name':
-//        print(product.name);
-        return product.name;
-        break;
-      case 'purchased_amount':
-        return product.purchased_amount;
-        break;
-      case 'purchased_qty':
-        return product.purchased_qty;
-        break;
-      case 'sold_amount':
-        return product.sold_amount;
-        break;
-      case 'sold_qty':
-        return product.sold_qty;
-        break;
-      case 'returned_amount':
-        return product.returned_amount;
-        break;
-      case 'returned_qty':
-        return product.returned_qty;
-        break;
-      case 'purchase_returned_amount':
-        return product.purchase_returned_amount;
-        break;
-      case 'purchase_returned_qty':
-        return product.purchase_returned_qty;
-        break;
-      case 'profit':
-        return product.profit;
-        break;
-      case 'in_stock':
-//        print(product.in_stock);
-        return product.in_stock;
-        break;
-      default:
-        return ' ';
-        break;
-    }
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map<Widget>((e) {
+      return Container(
+        alignment: Alignment.center,
+//            padding: EdgeInsets.all(0),
+        child: Text(e.value.toString()),
+      );
+    }).toList());
   }
 }

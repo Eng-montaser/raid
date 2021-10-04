@@ -234,8 +234,7 @@ class _Summary extends State<Summary> with TickerProviderStateMixin {
                                 controller: _customerEditingController),
                             onSuggestionSelected: (suggestion) {
                               setState(() {
-                                _customerEditingController.text =
-                                    '';
+                                _customerEditingController.text = '';
                                 customerData = suggestion;
                               });
                               setData();
@@ -259,11 +258,22 @@ class _Summary extends State<Summary> with TickerProviderStateMixin {
                                 ///------------------------------
                                 ///   Customer Data
                                 ///------------------------------
-                                headerRow(
-                                    'company'.tr(),
-                                    customerData != null
-                                        ? customerData.company_name
-                                        : ''),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    headerRow(
+                                        'name'.tr(),
+                                        customerData != null
+                                            ? customerData.name
+                                            : ''),
+                                    headerRow(
+                                        'company'.tr(),
+                                        customerData != null
+                                            ? customerData.company_name
+                                            : ''),
+                                  ],
+                                ),
                                 headerRow(
                                     'address'.tr(),
                                     customerData != null
@@ -1923,7 +1933,7 @@ class _Summary extends State<Summary> with TickerProviderStateMixin {
           SizedBox(
             width: 20,
           ),
-          Text(text)
+          Text('$text')
         ],
       ),
     );

@@ -150,7 +150,7 @@ class _AddExpense extends State<AddExpense> {
                         context: context,
                         builder: (context) => CupertinoActionSheet(
                             title: Text(
-                              "إختــــــر المخــزن",
+                              "إختــــــر المستودع",
                               style:
                                   FCITextStyle(color: accentColor).normal18(),
                             ),
@@ -192,7 +192,7 @@ class _AddExpense extends State<AddExpense> {
                       children: [
                         Text(
                           warehouse == null
-                              ? "إختــــــر المخــزن"
+                              ? "إختــــــر المستودع"
                               : warehouse.name,
                           style: FCITextStyle(color: accentColor).bold18(),
                         ),
@@ -294,7 +294,7 @@ class _AddExpense extends State<AddExpense> {
                       contentPadding: EdgeInsets.symmetric(
                           horizontal: ScreenUtil().setWidth(10)),
                       border: InputBorder.none,
-                      hintText: 'الكميــــة',
+                      hintText: 'المبـــلغ',
                     ),
                   ),
                 ),

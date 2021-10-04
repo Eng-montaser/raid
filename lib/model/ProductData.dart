@@ -6,7 +6,7 @@ class CatProductData {
   CatProductData({this.categoryId, this.name, this.image, this.is_active});
   CatProductData.fromJson(Map<String, dynamic> json) {
     categoryId = int.parse('${json['id']}');
-    name = json['name'] ?? 's';
+    name = json['name'] ?? '';
     image = json['image'];
     is_active = int.parse('${json['is_active']}');
   }
@@ -100,4 +100,39 @@ class CartItem {
   }
 
   CartItem({this.qty, this.product});
+}
+
+/*class Brand {
+  int id;
+  String title;
+  String image;
+  int is_active;
+  Brand({this.id, this.title, this.image, this.is_active});
+  Brand.fromJson(Map<String, dynamic> json) {
+    id = int.parse('${json['id']}');
+    title = json['title'] ?? '';
+    image = json['image'];
+    is_active = int.parse('${json['is_active']}');
+  }
+}*/
+
+class Unit {
+  int id;
+  String unit_code;
+  String unit_name;
+  int is_active;
+  int operation_value;
+  Unit(
+      {this.id,
+      this.unit_code,
+      this.unit_name,
+      this.is_active,
+      this.operation_value});
+  Unit.fromJson(Map<String, dynamic> json) {
+    id = int.parse('${json['id']}');
+    unit_code = json['unit_code'] ?? '';
+    unit_name = json['unit_name'] ?? '';
+    is_active = int.parse('${json['is_active']}');
+    operation_value = int.parse('${json['operation_value']}');
+  }
 }

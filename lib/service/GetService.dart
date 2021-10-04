@@ -75,6 +75,14 @@ class GetService extends BaseApi {
     return await api.httpGet('warehouses');
   }
 
+  Future<http.Response> getSuppliers() async {
+    return await api.httpGet('suppliers');
+  }
+
+  Future<http.Response> getUnits() async {
+    return await api.httpGet('unites');
+  }
+
 ///////end new services///////////
   Future<http.Response> getCustomersReports(
       int customerId, String startDate, String endDate) async {
@@ -87,15 +95,31 @@ class GetService extends BaseApi {
     });
   }
 
-  Future<http.Response> getStocksReports(
+  /*Future<http.Response> getStocksReports(
       String startDate, String endDate) async {
 //    https://fsdmarketing.com/alraayid/api/customers/report?customer_id=1&start_date=2020-01-01&end_date=2021-08-06
 //    return await api.httpGet('customers/report?customer_id=1&start_date=2020-01-01&end_date=2021-08-06');
     return await api.httpGet('stock',
         query: {'start_date': '$startDate', 'end_date': '$endDate'});
-  }
+  }*/
 
   Future<http.Response> getUserData() async {
     return await api.httpGet('user/details');
+  }
+
+  Future<http.Response> getStocksReports(
+      String startDate, String endDate, int page, int warehouseId) async {
+//    https://fsdmarketing.com/alraayid/api/customers/report?customer_id=1&start_date=2020-01-01&end_date=2021-08-06
+//    return await api.httpGet('customers/report?customer_id=1&start_date=2020-01-01&end_date=2021-08-06');
+    return await api.httpGet('stock', query: {
+      'start_date': '$startDate',
+      'end_date': '$endDate',
+      'page': '$page',
+      'warehouse_id': '${warehouseId.toString()}'
+    });
+  }
+
+  Future<http.Response> getWarehousesData() async {
+    return await api.httpGet('warehouses');
   }
 }

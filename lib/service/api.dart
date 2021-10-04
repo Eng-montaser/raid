@@ -18,25 +18,25 @@ class Api {
   String baseUrl = 'fsdmarketing.com';
   String path = '/alraayid/api';
 
-  Future<http.Response> httpGet(String endPath, {Map<String, String> query})async {
-    String token=await CacheManger().getToken();
+  Future<http.Response> httpGet(String endPath,
+      {Map<String, String> query}) async {
+    String token = await CacheManger().getToken();
     print(token);
     Uri uri = Uri.https(baseUrl, '$path/$endPath');
     if (query != null) {
       uri = Uri.https(baseUrl, '$path/$endPath', query);
     }
-    return http.get(uri,
-        headers: {
+    return http.get(uri, headers: {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
-    }
-    );
+    });
   }
 
   Future<http.Response> httpPost(String endPath, Object body) async {
-    String token=await CacheManger().getToken();
+    String token = await CacheManger().getToken();
     print(token);
     Uri uri = Uri.https(baseUrl, '$path/$endPath');
+    print('${uri.toString()}  ${body}');
     return http.post(uri, body: body, headers: {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
@@ -44,7 +44,7 @@ class Api {
   }
 
   Future<http.Response> httpPostWithFile(String endPath, {File file}) async {
-    String token=await CacheManger().getToken();
+    String token = await CacheManger().getToken();
     print(token);
     Map<String, String> headers = {
       'Authorization': 'Bearer $token',

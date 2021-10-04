@@ -45,8 +45,7 @@ class PostProvider extends BaseProvider {
     try {
       var response = await _postService.login(authenticationData);
       var data = jsonDecode(response.body);
-      print(data['user'].toString());
-      print(response.statusCode);
+
       if (response.statusCode == 200) {
         authenticationResult = new AuthenticationResult(
             success: true,
@@ -113,7 +112,6 @@ class PostProvider extends BaseProvider {
     try {
       var response = await _postService.addSale(datas);
       var data = jsonDecode(response.body);
-      print('returns ${response.statusCode} ${response.body}');
       if (response.statusCode == 200) {
         result = true;
         notifyListeners();
@@ -127,6 +125,26 @@ class PostProvider extends BaseProvider {
     return result;
   }
 
+  Future<bool> addPurchase(var datas) async {
+    bool result = false;
+    setBusy(true);
+    try {
+      var response = await _postService.addPurchse(datas);
+      var data = jsonDecode(response.body);
+      print('returns ${response.statusCode} ${response.body}');
+      if (response.statusCode == 200) {
+        result = true;
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      print('sss $e');
+      setBusy(false);
+    }
+    setBusy(false);
+    return result;
+  }
+
   ////new provider/////
   Future<bool> addCustomer(var datas) async {
     bool result = false;
@@ -134,7 +152,6 @@ class PostProvider extends BaseProvider {
     try {
       var response = await _postService.addCustomer(datas);
       var data = jsonDecode(response.body);
-      print('returns ${response.statusCode} ${response.body}');
       if (response.statusCode == 200) {
         result = true;
         notifyListeners();
@@ -154,7 +171,6 @@ class PostProvider extends BaseProvider {
     try {
       var response = await _postService.addSupplier(datas);
       var data = jsonDecode(response.body);
-      print('returns ${response.statusCode} ${response.body}');
       if (response.statusCode == 200) {
         result = true;
         notifyListeners();
@@ -174,8 +190,27 @@ class PostProvider extends BaseProvider {
     try {
       var response = await _postService.addExpense(datas);
       var data = jsonDecode(response.body);
-      print('returns ${response.statusCode} ${response.body}');
       if (response.statusCode == 200) {
+        result = true;
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      print(e);
+      setBusy(false);
+    }
+    setBusy(false);
+    return result;
+  }
+
+  Future<bool> addProduct(var datas) async {
+    bool result = false;
+    setBusy(true);
+    try {
+      var response = await _postService.addProduct(datas);
+      var data = jsonDecode(response.body);
+      print('returns ${response.statusCode} ${response.body}');
+      if (response.statusCode == 201) {
         result = true;
         notifyListeners();
         setBusy(false);

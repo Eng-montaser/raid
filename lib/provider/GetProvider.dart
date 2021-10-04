@@ -86,7 +86,6 @@ class GetProvider extends BaseProvider {
         data['data'].forEach((catProduct) =>
             _catProducts.add(CatProductData.fromJson(catProduct)));
         _catProducts.forEach((CatProductData element) {});
-        print('cats ${response.statusCode} ${response.body}');
         notifyListeners();
         setBusy(false);
       }
@@ -126,7 +125,6 @@ class GetProvider extends BaseProvider {
         _products = [];
         data['data']
             .forEach((product) => _products.add(ProductData.fromJson(product)));
-        print(' sss ${response.statusCode} ${response.body}');
         notifyListeners();
         setBusy(false);
       }
@@ -162,7 +160,6 @@ class GetProvider extends BaseProvider {
 
     try {
       var response = await _getService.searchProduct(text);
-      print('${response.body}');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data['data'].forEach(
@@ -215,6 +212,25 @@ class GetProvider extends BaseProvider {
     }
     setBusy(false);
     return _brandsData;
+  }
+
+  Future<List<Unit>> getUnits() async {
+    List<Unit> units = [];
+    setBusy(true);
+    try {
+      var response = await _getService.getUnits();
+      var data = jsonDecode(response.body);
+      print('mmm ${response.statusCode} ${response.body}');
+      if (response.statusCode == 201) {
+        data['unites'].forEach((product) => units.add(Unit.fromJson(product)));
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return units;
   }
 
   ///Cat And Offers --------------------------------------
@@ -309,7 +325,6 @@ class GetProvider extends BaseProvider {
         setBusy(false);
       }
     } catch (e) {
-      print(e);
       setBusy(false);
     }
     setBusy(false);
@@ -328,7 +343,6 @@ class GetProvider extends BaseProvider {
         setBusy(false);
       }
     } catch (e) {
-      print(e);
       setBusy(false);
     }
     setBusy(false);
@@ -341,18 +355,15 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getCustomers();
       var data = jsonDecode(response.body);
-      print(response.statusCode);
       if (response.statusCode == 201) {
         _customersData = [];
         data.forEach((customer) {
           _customersData.add(CustomersData.fromJson(customer));
-          print(customer);
         });
         notifyListeners();
         setBusy(false);
       }
     } catch (e) {
-      print(e);
       setBusy(false);
     }
     setBusy(false);
@@ -367,16 +378,13 @@ class GetProvider extends BaseProvider {
       var response =
           await _getService.getCustomersReports(customerId, startDate, endDate);
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print("|||||||||");
-      print(data);
+
       if (response.statusCode == 200) {
         _customersReportData = CustomersReportData.fromJson(data);
         notifyListeners();
         setBusy(false);
       }
     } catch (e) {
-      print(e);
       setBusy(false);
     }
     setBusy(false);
@@ -388,16 +396,13 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getUserData();
       var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print("|||||||||");
-      print(data);
+
       if (response.statusCode == 200) {
 //        _customersReportData = CustomersReportData.fromJson(data);
         notifyListeners();
         setBusy(false);
       }
     } catch (e) {
-      print(e);
       setBusy(false);
     }
     setBusy(false);
@@ -405,34 +410,6 @@ class GetProvider extends BaseProvider {
   }
 
   ///StockReport Data --------------------------------------
-  Future<List<ProductReportData>> getStocksReports(
-      String startDate, String endDate) async {
-    List<ProductReportData> _productReportData = [];
-    setBusy(true);
-    try {
-      var response = await _getService.getStocksReports(startDate, endDate);
-      var data = jsonDecode(response.body);
-      print(response.statusCode);
-      print(response.body);
-      if (response.statusCode == 200) {
-        data['data'].forEach((productReport) {
-          print(productReport);
-        });
-        _productReportData = [];
-        data['data'].forEach((productReport) {
-          _productReportData.add(ProductReportData.fromJson(productReport));
-        });
-
-        notifyListeners();
-        setBusy(false);
-      }
-    } catch (e) {
-      print(e);
-      setBusy(false);
-    }
-    setBusy(false);
-    return _productReportData;
-  }
 
 //////new providers///////
   Future<List<ExpenseCategory>> getExpenseCategories() async {
@@ -441,7 +418,6 @@ class GetProvider extends BaseProvider {
 
     try {
       var response = await _getService.getExpenseCategories();
-      print('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data['data'].forEach(
@@ -463,7 +439,6 @@ class GetProvider extends BaseProvider {
 
     try {
       var response = await _getService.getAccounts();
-      print('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data['data'].forEach(
@@ -485,7 +460,6 @@ class GetProvider extends BaseProvider {
 
     try {
       var response = await _getService.getWarehouses();
-      print('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data['data'].forEach(
@@ -507,7 +481,6 @@ class GetProvider extends BaseProvider {
 
     try {
       var response = await _getService.getCustomerGroups();
-      print('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data['data'].forEach(
@@ -521,5 +494,83 @@ class GetProvider extends BaseProvider {
     }
     setBusy(false);
     return searchProducts;
+  }
+
+  Future<List<SuppliersData>> getSuppliers() async {
+    List<SuppliersData> searchProducts = [];
+    setBusy(true);
+
+    try {
+      var response = await _getService.getSuppliers();
+      print('sup ${response.statusCode} ${response.body}');
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        data['data'].forEach(
+            (product) => searchProducts.add(SuppliersData.fromJson(product)));
+
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return searchProducts;
+  }
+
+  Future<ProductReportDataList> getStocksReports(
+      String startDate, String endDate, int page, int warehouseId) async {
+    ProductReportDataList _productReportDataList;
+    setBusy(true);
+    try {
+      var response = await _getService.getStocksReports(
+          startDate, endDate, page, warehouseId);
+      var data = jsonDecode(response.body);
+      print(response.statusCode);
+      Map<dynamic, dynamic> da = jsonDecode(response.body);
+      print(da["data"]);
+      for (dynamic key in da.keys) {
+        if (key != "data") {
+          print(key);
+          print(da[key].toString());
+        }
+      }
+      print(response.body);
+      if (response.statusCode == 200) {
+        _productReportDataList = ProductReportDataList.fromJson(data);
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      print(e);
+      setBusy(false);
+    }
+    setBusy(false);
+    return _productReportDataList;
+  }
+
+  Future<List<WarehousesData>> getWarehousesData() async {
+    List<WarehousesData> _warehousesDataList;
+    setBusy(true);
+    try {
+      var response = await _getService.getWarehousesData();
+      var data = jsonDecode(response.body);
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        _warehousesDataList = [];
+        _warehousesDataList.add(new WarehousesData(name: 'الكل', wId: 1));
+        data['data'].forEach((warehouse) {
+          _warehousesDataList.add(WarehousesData.fromJson(warehouse));
+        });
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      print(e);
+      setBusy(false);
+    }
+    setBusy(false);
+    return _warehousesDataList;
   }
 }
