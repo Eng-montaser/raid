@@ -8,11 +8,12 @@ import 'package:raid/style/FCITextStyles.dart';
 import '../../../constants.dart';
 
 class ConciliationDetailsCard extends StatefulWidget {
-  List<Integrations> conciliationData;
-  String name;
-  String searchText;
+   List<Integrations> conciliationData;
+   String name;
+   String searchText;
 
-  ConciliationDetailsCard({this.conciliationData, this.name, this.searchText});
+   ConciliationDetailsCard({Key key, this.conciliationData, this.name, this.searchText}) : super(key: key);
+
   @override
   _ConciliationDetailsCardState createState() =>
       _ConciliationDetailsCardState();
@@ -43,7 +44,7 @@ class _ConciliationDetailsCardState extends State<ConciliationDetailsCard> {
                 Table(
                   defaultColumnWidth: IntrinsicColumnWidth(),
                   columnWidths: <int, TableColumnWidth>{
-                    0: FixedColumnWidth(ScreenUtil().setWidth(100)),
+                    0: FixedColumnWidth(ScreenUtil().setWidth(120)),
                     1: const FlexColumnWidth(3),
                   },
                   border: TableBorder.all(color: Colors.grey),
@@ -58,19 +59,24 @@ class _ConciliationDetailsCardState extends State<ConciliationDetailsCard> {
                         widget.conciliationData[indx].tags.split(',');
                     return TableRow(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              '${widget.conciliationData[indx].name}',
-                              style: Theme.of(context).textTheme.subtitle2,
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size:
-                                  Theme.of(context).textTheme.caption.fontSize,
-                            ),
-                          ],
+                        FittedBox(
+                          //  width: ScreenUtil().setWidth(120),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                ' ${widget.conciliationData[indx].name}',
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: Theme.of(context)
+                                    .textTheme
+                                    .caption
+                                    .fontSize,
+                              ),
+                            ],
+                          ),
                         ),
                         Wrap(
                           children: List.generate(

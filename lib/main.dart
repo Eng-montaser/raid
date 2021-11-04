@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
             builder: () => MaterialApp(
               key: ValueKey<Locale>(context.locale),
               debugShowCheckedModeBanner: false,
-              title: 'الرائد',
+              title: 'الرائد والقناص',
               theme: ThemeData(
                 fontFamily: GoogleFonts.elMessiri().fontFamily,
                 primaryColor: PrimaryColor,

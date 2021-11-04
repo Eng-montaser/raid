@@ -83,6 +83,14 @@ class GetService extends BaseApi {
     return await api.httpGet('unites');
   }
 
+  Future<http.Response> getSearchBrand(int cat_id) async {
+    return await api.httpGet('integrations/get_brands/$cat_id');
+  }
+
+  Future<http.Response> getSearchModel(String brand, int cat_id) async {
+    return await api.httpGet('integrations/get_models/$cat_id/$brand');
+  }
+
 ///////end new services///////////
   Future<http.Response> getCustomersReports(
       int customerId, String startDate, String endDate) async {

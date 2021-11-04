@@ -2,7 +2,7 @@
     package="com.raid">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="الرائد"
+        android:label="الرائد والقناص"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

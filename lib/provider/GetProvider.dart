@@ -181,6 +181,7 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getIntegrations();
       var data = jsonDecode(response.body);
+      print('ttt ${response.body}');
       if (response.statusCode == 201) {
         _conciliationData = [];
         data['data'].forEach((product) =>
@@ -193,6 +194,46 @@ class GetProvider extends BaseProvider {
     }
     setBusy(false);
     return _conciliationData;
+  }
+
+  Future<List<String>> getSearchBrand(int cat_id) async {
+    List<String> brands = [];
+    setBusy(true);
+    try {
+      var response = await _getService.getSearchBrand(cat_id);
+      print('${response.statusCode} ${response.body}');
+      if (response.statusCode == 201) {
+        var data = jsonDecode(response.body);
+
+        data.forEach((item) => brands.add(item));
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return brands;
+  }
+
+  Future<List<Integrations>> getSearchModel(String text, int cat_id) async {
+    List<Integrations> integrations = [];
+    setBusy(true);
+    try {
+      var response = await _getService.getSearchModel(text, cat_id);
+      if (response.statusCode == 201) {
+        var data = jsonDecode(response.body);
+
+        data['data'].forEach(
+            (product) => integrations.add(Integrations.fromJson(product)));
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return integrations;
   }
 
   ///Cat And Brands --------------------------------------

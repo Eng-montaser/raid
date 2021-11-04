@@ -16,15 +16,16 @@ class Api {
 
   ///*****************************************************
   String baseUrl = 'fsdmarketing.com';
+  //String baseUrl = 'ar-akgroup.com';
   String path = '/alraayid/api';
 
   Future<http.Response> httpGet(String endPath,
       {Map<String, String> query}) async {
     String token = await CacheManger().getToken();
     print(token);
-    Uri uri = Uri.https(baseUrl, '$path/$endPath');
+    Uri uri = Uri.http(baseUrl, '$path/$endPath');
     if (query != null) {
-      uri = Uri.https(baseUrl, '$path/$endPath', query);
+      uri = Uri.http(baseUrl, '$path/$endPath', query);
     }
     return http.get(uri, headers: {
       'Authorization': 'Bearer $token',
@@ -35,7 +36,7 @@ class Api {
   Future<http.Response> httpPost(String endPath, Object body) async {
     String token = await CacheManger().getToken();
     print(token);
-    Uri uri = Uri.https(baseUrl, '$path/$endPath');
+    Uri uri = Uri.http(baseUrl, '$path/$endPath');
     print('${uri.toString()}  ${body}');
     return http.post(uri, body: body, headers: {
       'Authorization': 'Bearer $token',
@@ -51,7 +52,7 @@ class Api {
       'Accept': 'application/json',
     };
 
-    Uri uri = Uri.https(baseUrl, '$path/$endPath');
+    Uri uri = Uri.http(baseUrl, '$path/$endPath');
     var length = await file.length();
     http.MultipartRequest request = new http.MultipartRequest('POST', uri)
       ..headers.addAll(headers)

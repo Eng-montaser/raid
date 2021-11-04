@@ -84,17 +84,15 @@ class _ConciliationCardState extends State<ConciliationCard> {
               )),
         ),
         SizedBox(
-          height: ScreenUtil().setHeight(10),
+          height: ScreenUtil().setHeight(20),
         ),
-        if (data.isNotEmpty)
+        /* if (data.isNotEmpty)
           Text(
             '${data}',
             style: FCITextStyle(color: AccentColor).normal10(),
             textAlign: TextAlign.center,
-          ),
-        SizedBox(
-          height: ScreenUtil().setHeight(10),
-        ),
+          ),*/
+
         InkWell(
           onTap: () {
             widget.moreChange(true);

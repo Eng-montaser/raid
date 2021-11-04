@@ -9,6 +9,7 @@ import 'package:raid/model/ConciliationData.dart';
 import 'package:raid/provider/GetProvider.dart';
 import 'package:raid/provider/PostProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
+import 'package:raid/ui/HomeTaps/Conciliation/search_page.dart';
 import 'package:raid/widget/rounded_input_field.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -24,7 +25,8 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
   //List<ConciliationData> conciliationData = [];
   ScrollController _scrollController = ScrollController();
   TextEditingController searchController = TextEditingController(text: '');
-  List<ConciliationData> temp, temp2;
+  List<ConciliationData> temp = [], temp2 = [];
+  ConciliationData searchConciliationData;
   @override
   void initState() {
     super.initState();
@@ -50,6 +52,7 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
     var getProvider = Provider.of<GetProvider>(context, listen: true);
     Size size = MediaQuery.of(context).size;
     searchtext = searchController.text;
+
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.fromLTRB(
@@ -98,13 +101,25 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
                                     },
                                     child: Icon(Icons.arrow_back_ios_outlined),
                                   ),
-                                CustomTextInput(
-                                  obscure: false,
-                                  suffixicon:
-                                      Icon(Icons.keyboard_arrow_down_sharp),
-                                  hintText: 'search'.tr(),
-                                  leading: Icons.filter_alt_sharp,
-                                  controller: searchController,
+                                InkWell(
+                                  onTap: () {
+                                    if (searchConciliationData != null)
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => ConcSearch(
+                                                    data:
+                                                        searchConciliationData,
+                                                  )));
+                                  },
+                                  child: CustomTextInput(
+                                    obscure: false,
+                                    enabled: false,
+                                    suffixicon:
+                                        Icon(Icons.keyboard_arrow_down_sharp),
+                                    hintText: 'search'.tr(),
+                                    leading: Icons.filter_alt_sharp,
+                                    controller: searchController,
+                                  ),
                                 ),
                               ],
                             ))
@@ -119,7 +134,15 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
                                 moreChange: (val) {
                                   setState(() {
                                     moreDetails = val;
+                                    searchConciliationData =
+                                        getProvider.conciliationData[index - 1];
                                   });
+//                                  if (val) {
+//                                    _scrollController.animateTo(
+//                                        _scrollController.offset + 200,
+//                                        duration: Duration(milliseconds: 500),
+//                                        curve: Curves.ease);
+//                                  }
                                 },
                               )
                             : ConciliationDetailsCard(
@@ -169,6 +192,16 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
             ),
           )),
     );
+  }
+
+  void _moveDown(GlobalKey myKey) {
+    final keyContext = myKey.currentContext;
+
+    if (keyContext != null) {
+      final box = keyContext.findRenderObject() as RenderBox;
+      _scrollController.animateTo(_scrollController.offset + box.size.height,
+          duration: Duration(milliseconds: 100), curve: Curves.linear);
+    }
   }
 
   ///------------------------------------------
