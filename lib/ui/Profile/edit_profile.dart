@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:easy_localization/easy_localization.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/model/UserData.dart';
 import 'package:raid/provider/AuthProvider.dart';
-import 'package:raid/ui/Profile/Profile.dart';
 import 'package:raid/widget/button_animated.dart';
 import 'package:raid/widget/rounded_input_field.dart';
 
@@ -36,14 +33,16 @@ class _EditProfileState extends State<EditProfile>
     );
     setData();
   }
-  setData()async{
-    var provider  = Provider.of<AuthProvider>(context, listen: false);
+
+  setData() async {
+    var provider = Provider.of<AuthProvider>(context, listen: false);
     _nameTextEditingController =
-    new TextEditingController(text:provider.userData.name);
+        new TextEditingController(text: provider.userData.name);
     _phoneTextEditingController =
-    new TextEditingController(text: provider.userData.phone);
-    print(provider.userData.token);
+        new TextEditingController(text: provider.userData.phone);
+    //print(provider.userData.token);
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -62,6 +61,7 @@ class _EditProfileState extends State<EditProfile>
     }
     return res;
   }
+
   Future<Null> _playAnimation() async {
     try {
       setState(() {
@@ -83,6 +83,7 @@ class _EditProfileState extends State<EditProfile>
       //  printLog('[_stopAnimation] error');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<AuthProvider>(context);
@@ -109,10 +110,10 @@ class _EditProfileState extends State<EditProfile>
                     vertical: ScreenUtil().setHeight(4)),
                 //margin: EdgeInsets.all( ),
                 decoration: BoxDecoration(
-                    color: Colors.grey[200], borderRadius: BorderRadius.circular(7)),
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(7)),
                 child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop()
-                  ,
+                  onTap: () => Navigator.of(context).pop(),
                   child: Icon(
                     Icons.arrow_back_ios_sharp,
                     color: Colors.black,
@@ -142,13 +143,14 @@ class _EditProfileState extends State<EditProfile>
                 children: <Widget>[
                   CircleAvatar(
                     radius: 70,
-                    child: Image.asset('assets/images/man-300x300.png',
+                    child: Image.asset(
+                      'assets/images/man-300x300.png',
                       height: ScreenUtil().setHeight(150),
                       width: ScreenUtil().setWidth(150),
-                      fit: BoxFit.contain,),
+                      fit: BoxFit.contain,
+                    ),
                     backgroundColor: Colors.white,
                   ),
-
                   CustomTextInput(
                     hintText: 'الاسم',
                     leading: Icons.person,
@@ -159,30 +161,35 @@ class _EditProfileState extends State<EditProfile>
                     hintText: 'رقم الجوال',
                     leading: Icons.phone_android,
                     obscure: false,
-                    controller:_phoneTextEditingController,
+                    controller: _phoneTextEditingController,
                   ),
-                  SizedBox(height: ScreenUtil().setHeight(50),),
+                  SizedBox(
+                    height: ScreenUtil().setHeight(50),
+                  ),
                   StaggerAnimation(
                     titleButton: "تعديل",
                     foreground: Colors.white,
                     background: primaryColor,
                     buttonController: _loginButtonController.view,
                     onTap: () async {
-                      if (_nameTextEditingController.text.isNotEmpty && _phoneTextEditingController.text.isNotEmpty){
+                      if (_nameTextEditingController.text.isNotEmpty &&
+                          _phoneTextEditingController.text.isNotEmpty) {
                         await _playAnimation();
-                        AuthenticationData authenticationData=new AuthenticationData(
-                            name: _nameTextEditingController.text,
-                            phone: _phoneTextEditingController.text
-                        );
-                      await  provider.updateUserData(authenticationData).then((response) {
-                          if(response.success){
+                        AuthenticationData authenticationData =
+                            new AuthenticationData(
+                                name: _nameTextEditingController.text,
+                                phone: _phoneTextEditingController.text);
+                        await provider
+                            .updateUserData(authenticationData)
+                            .then((response) {
+                          if (response.success) {
                             response.successUpdateMessage(context);
 //                            Timer(Duration(seconds: 3), () {
 //                              Navigator.push(
 //                                  context,
 //                                  MaterialPageRoute(builder: (context) => Profile()));
 //                            });
-                          }else{
+                          } else {
                             response.failUpdateMessage(context);
                           }
                         });

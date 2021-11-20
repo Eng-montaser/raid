@@ -52,14 +52,14 @@ class _ShoppingCartRowState extends State<ShoppingCartRow> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Container(
+                      /*Container(
                         width: constraints.maxWidth * 0.25,
                         height: constraints.maxWidth * 0.3,
                         child: Image.network(
                           widget.product.image,
                           fit: BoxFit.contain,
                         ),
-                      ),
+                      ),*/
                       SizedBox(width: ScreenUtil().setWidth(16)),
                       Expanded(
                         child: SingleChildScrollView(
@@ -94,8 +94,10 @@ class _ShoppingCartRowState extends State<ShoppingCartRow> {
                                 width: ScreenUtil().setWidth(60),
                                 height: ScreenUtil().setHeight(30),
                                 color: Theme.of(context).accentColor,
-                                limitSelectQuantity: int.parse(
-                                    '${widget.product.qty}'.split('.')[0]),
+                                limitSelectQuantity: widget.product?.qty != null
+                                    ? int.parse(
+                                        '${widget.product.qty}'.split('.')[0])
+                                    : 100,
                                 value: widget.quantity,
                                 onChanged: (val) {
                                   widget.onChangeQuantity(val);

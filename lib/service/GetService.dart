@@ -6,20 +6,27 @@ class GetService extends BaseApi {
     return await api.httpGet('categories');
   }
 
-  Future<http.Response> getProducts() async {
-    return await api.httpGet('products');
+  Future<http.Response> getProducts(int page) async {
+    return await api.httpGet('products', query: {'page': '$page'});
   }
 
-  Future<http.Response> searchProduct(String text) async {
-    return await api.httpGet('products', query: {'search': '$text'});
+  Future<http.Response> searchProduct(String text, int page) async {
+    return await api
+        .httpGet('products', query: {'search': '$text', 'page': '$page'});
   }
 
-  Future<http.Response> getOffers() async {
-    return await api.httpGet('offers');
+  Future<http.Response> getOffers(int page) async {
+    return await api.httpGet('offers', query: {'page': '$page'});
   }
 
-  Future<http.Response> getProductById(int id) async {
-    return await api.httpGet('products', query: {'category_id': '$id'});
+  Future<http.Response> searchOffers(String text, int page) async {
+    return await api
+        .httpGet('offers', query: {'search': '$text', 'page': '$page'});
+  }
+
+  Future<http.Response> getProductById(int id, int page) async {
+    return await api
+        .httpGet('products', query: {'category_id': '$id', 'page': '$page'});
   }
 
   Future<http.Response> getAllProducts() async {

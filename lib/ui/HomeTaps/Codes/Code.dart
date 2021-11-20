@@ -16,15 +16,9 @@ class CodeScreen extends StatefulWidget {
 
 class _CodeScreenState extends State<CodeScreen> {
   TextEditingController searchController = new TextEditingController(text: '');
-  String searchText = '';
   @override
   void initState() {
     super.initState();
-    searchController.addListener(() {
-      setState(() {
-        searchText = searchController.text;
-      });
-    });
   }
 
   @override
@@ -34,26 +28,94 @@ class _CodeScreenState extends State<CodeScreen> {
     return provider.busy
         ? loading()
         : ListView.builder(
-            itemCount: provider.codesData
-                    .where((element) =>
-                        element.description.contains(searchController.text))
-                    .length +
-                1,
-            itemBuilder: (context, index) => index == 0
-                ? Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: ScreenUtil().setHeight(10),
-                        horizontal: ScreenUtil().setWidth(100)),
-                    child: CustomTextInput(
-                      obscure: false,
-                      controller: searchController,
-                      suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
-                      hintText: 'search'.tr(),
-                      leading: Icons.filter_alt_sharp,
-                    ))
-                : CodeCard(
+            itemCount: provider.codesData.length + 1,
+            itemBuilder: (context, index) {
+              if (searchController.text.isEmpty) {
+                if (index == 0)
+                  return Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setHeight(10),
+                          horizontal: ScreenUtil().setWidth(100)),
+                      child: CustomTextInput(
+                        obscure: false,
+                        controller: searchController,
+                        suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
+                        hintText: 'search'.tr(),
+                        leading: Icons.filter_alt_sharp,
+                      ));
+                else
+                  CodeCard(
                     codeData: provider.codesData[index - 1],
-                    searchText: searchText,
-                  ));
+                    searchText: searchController.text,
+                  );
+              } else {
+                if (index == 0)
+                  return Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: ScreenUtil().setHeight(10),
+                          horizontal: ScreenUtil().setWidth(100)),
+                      child: CustomTextInput(
+                        obscure: false,
+                        controller: searchController,
+                        suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
+                        hintText: 'search'.tr(),
+                        leading: Icons.filter_alt_sharp,
+                      ));
+                else
+                  CodeCard(
+                    codeData: provider.codesData[index - 1],
+                    searchText: searchController.text,
+                  );
+              }
+            });
   }
 }
+
+//class CodeScreen extends StatefulWidget {
+//  @override
+//  _CodeScreenState createState() => _CodeScreenState();
+//}
+//
+//class _CodeScreenState extends State<CodeScreen> {
+//  TextEditingController searchController = new TextEditingController(text: '');
+//  String searchText = '';
+//  @override
+//  void initState() {
+//    super.initState();
+//    searchController.addListener(() {
+//      setState(() {
+//        searchText = searchController.text;
+//      });
+//    });
+//  }
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    Size size = MediaQuery.of(context).size;
+//    var provider = Provider.of<GetProvider>(context, listen: false);
+//    return provider.busy
+//        ? loading()
+//        : ListView.builder(
+//            itemCount: provider.codesData
+//                    .where((element) =>
+//                        element.description.contains(searchController.text))
+//                    .length +
+//                1,
+//            itemBuilder: (context, index) => index == 0
+//                ? Padding(
+//                    padding: EdgeInsets.symmetric(
+//                        vertical: ScreenUtil().setHeight(10),
+//                        horizontal: ScreenUtil().setWidth(100)),
+//                    child: CustomTextInput(
+//                      obscure: false,
+//                      controller: searchController,
+//                      suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
+//                      hintText: 'search'.tr(),
+//                      leading: Icons.filter_alt_sharp,
+//                    ))
+//                : CodeCard(
+//                    codeData: provider.codesData[index - 1],
+//                    searchText: searchText,
+//                  ));
+//  }
+//}

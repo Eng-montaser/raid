@@ -21,8 +21,11 @@ class GetProvider extends BaseProvider {
 
   List<CatProductData> get catProducts => _catProducts;
   List<ProductData> _products = [];
-
+  Product _mproducts;
+  Offer _offers;
   List<ProductData> get products => _products;
+  Offer get offers => _offers;
+  Product get mproducts => _mproducts;
 
   ///Cat And Conciliation ---------------------------------
   List<ConciliationData> _conciliationData = [];
@@ -96,15 +99,18 @@ class GetProvider extends BaseProvider {
     return _catProducts;
   }
 
-  Future<List<ProductData>> getProducts() async {
+  Future<Product> getProducts(int page) async {
     setBusy(true);
     try {
-      var response = await _getService.getProducts();
+      var response = await _getService.getProducts(page);
       var data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        _products = [];
-        data['data']
-            .forEach((product) => _products.add(ProductData.fromJson(product)));
+        _mproducts = Product.fromJson(data);
+        if (page == 1) {
+          _products = _mproducts.productdata;
+        } else {
+          products.addAll(_mproducts.productdata);
+        }
         notifyListeners();
         setBusy(false);
       }
@@ -112,19 +118,23 @@ class GetProvider extends BaseProvider {
       setBusy(false);
     }
     setBusy(false);
-    return _products;
+    return _mproducts;
   }
 
-  Future<List<ProductData>> getProductById(int id) async {
+  ///Cat And Offers --------------------------------------
+  Future<Offer> getOffers(int page) async {
     setBusy(true);
     try {
-      var response = await _getService.getProductById(id);
+      var response = await _getService.getOffers(page);
       var data = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        _offers = Offer.fromJson(data);
+        if (page == 1) {
+          _productOffers = _offers.productdata;
+        } else {
+          _productOffers.addAll(_offers.productdata);
+        }
 
-      if (response.statusCode == 200) {
-        _products = [];
-        data['data']
-            .forEach((product) => _products.add(ProductData.fromJson(product)));
         notifyListeners();
         setBusy(false);
       }
@@ -132,7 +142,53 @@ class GetProvider extends BaseProvider {
       setBusy(false);
     }
     setBusy(false);
-    return _products;
+    return _offers;
+  }
+
+  Future<Offer> searchOffers(String text, int page) async {
+    setBusy(true);
+    try {
+      var response = await _getService.searchOffers(text, page);
+      var data = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        _offers = Offer.fromJson(data);
+        if (page == 1) {
+          _productOffers = _offers.productdata;
+        } else {
+          _productOffers.addAll(_offers.productdata);
+        }
+
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return _offers;
+  }
+
+  Future<Product> getProductById(int id, int page) async {
+    setBusy(true);
+    try {
+      var response = await _getService.getProductById(id, page);
+      var data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        _mproducts = Product.fromJson(data);
+        if (page == 1) {
+          _products = _mproducts.productdata;
+        } else {
+          products.addAll(_mproducts.productdata);
+        }
+        notifyListeners();
+        setBusy(false);
+      }
+    } catch (e) {
+      setBusy(false);
+    }
+    setBusy(false);
+    return _mproducts;
   }
 
   Future<List<ProductData>> getAllProducts() async {
@@ -143,7 +199,10 @@ class GetProvider extends BaseProvider {
 
       if (response.statusCode == 201) {
         _products = [];
-        data.forEach((product) => _products.add(ProductData.fromJson(product)));
+        data.forEach((product) {
+          if (ProductData.fromJson(product).price != null)
+            _products.add(ProductData.fromJson(product));
+        });
         notifyListeners();
         setBusy(false);
       }
@@ -154,22 +213,27 @@ class GetProvider extends BaseProvider {
     return _products;
   }
 
-  Future<List<ProductData>> searchProduct(String text) async {
-    List<ProductData> searchProducts = [];
+  Future<Product> searchProduct(String text, int page) async {
+    Product searchProducts;
     setBusy(true);
-
     try {
-      var response = await _getService.searchProduct(text);
+      var response = await _getService.searchProduct(text, page);
+
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        data['data'].forEach(
-            (product) => searchProducts.add(ProductData.fromJson(product)));
+        searchProducts = Product.fromJson(data);
+        /* if (page == 1) {
+          _products = _mproducts.productdata;
+        } else {
+          products.addAll(_mproducts.productdata);
+        }*/
 
         notifyListeners();
         setBusy(false);
       }
     } catch (e) {
       setBusy(false);
+      //print('sss $e');
     }
     setBusy(false);
     return searchProducts;
@@ -181,7 +245,6 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getIntegrations();
       var data = jsonDecode(response.body);
-      print('ttt ${response.body}');
       if (response.statusCode == 201) {
         _conciliationData = [];
         data['data'].forEach((product) =>
@@ -261,7 +324,6 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getUnits();
       var data = jsonDecode(response.body);
-      print('mmm ${response.statusCode} ${response.body}');
       if (response.statusCode == 201) {
         data['unites'].forEach((product) => units.add(Unit.fromJson(product)));
         notifyListeners();
@@ -272,26 +334,6 @@ class GetProvider extends BaseProvider {
     }
     setBusy(false);
     return units;
-  }
-
-  ///Cat And Offers --------------------------------------
-  Future<List<ProductOffer>> getOffers() async {
-    setBusy(true);
-    try {
-      var response = await _getService.getOffers();
-      var data = jsonDecode(response.body);
-      if (response.statusCode == 201) {
-        _productOffers = [];
-        data['data'].forEach(
-            (product) => _productOffers.add(ProductOffer.fromJson(product)));
-        notifyListeners();
-        setBusy(false);
-      }
-    } catch (e) {
-      setBusy(false);
-    }
-    setBusy(false);
-    return _productOffers;
   }
 
   ///Cat And Service --------------------------------------
@@ -339,10 +381,11 @@ class GetProvider extends BaseProvider {
     setBusy(true);
     try {
       var response = await _getService.getCodes();
-      var data = jsonDecode(response.body);
+
       if (response.statusCode == 201) {
+        var data = jsonDecode(response.body);
         _codesData = [];
-        data['data']
+        data['all_search_data']
             .forEach((product) => _codesData.add(CodeData.fromJson(product)));
         notifyListeners();
         setBusy(false);

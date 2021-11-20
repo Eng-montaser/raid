@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
-import 'package:raid/model/VideoData.dart';
 import 'package:raid/provider/GetProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
 
@@ -18,6 +17,9 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<GetProvider>(context, listen: false).getVideos();
+    });
   }
 
   @override
@@ -51,7 +53,8 @@ class _VideoScreenState extends State<VideoScreen> {
                       ],
                     )
                   : Padding(
-                      child: VideoCard(videoData: provider.videosData[index - 1]),
+                      child:
+                          VideoCard(videoData: provider.videosData[index - 1]),
                       padding: EdgeInsets.symmetric(
                           vertical: ScreenUtil().setHeight(10))),
             ),

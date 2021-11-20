@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
-import 'package:raid/model/BrandData.dart';
 import 'package:raid/provider/GetProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
 
@@ -14,11 +13,12 @@ class BrandsScreen extends StatefulWidget {
 }
 
 class _BrandsScreenState extends State<BrandsScreen> {
-
-
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<GetProvider>(context, listen: false).getBrands();
+    });
   }
 
   @override

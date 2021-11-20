@@ -12,6 +12,34 @@ class CatProductData {
   }
 }
 
+class Product {
+  int current_page;
+  int last_page;
+  List<ProductData> productdata;
+  Product({this.current_page, this.last_page, this.productdata});
+  Product.fromJson(Map<String, dynamic> json) {
+    try {
+      current_page = int.parse('${json['current_page']}');
+      last_page = int.parse('${json['last_page']}');
+      productdata = [];
+      if (current_page == 1)
+        json['data'].forEach((productReport) {
+          productdata.add(ProductData.fromJson(productReport));
+        });
+      else {
+        int from = json['from'] - 1;
+        int to = json['to'];
+        for (int i = from; i < to; i++) {
+          //   print("item ${i}");
+          productdata.add(ProductData.fromJson(json['data']['${i}']));
+        }
+      }
+    } catch (e) {
+      print('catch $e');
+    }
+  }
+}
+
 class ProductData {
   int productId;
   int key;
@@ -27,6 +55,7 @@ class ProductData {
   String stock_worth;
   double offer;
   String description;
+
   ProductData(
       {this.productId,
       this.key,
@@ -55,12 +84,42 @@ class ProductData {
           ? double.parse('${json['qty'].toString().replaceAll(' ', '')}')
           : 1.0;
       unit = json['unit'];
-      price = json['price'] != null ? double.parse('${json['price']}') : 1.0;
+      price = json['price'] != null && json['price'].toString().isNotEmpty
+          ? double.parse('${json['price']}')
+          : 1.0;
       cost = double.parse('${json['cost']}');
       stock_worth = json['stock_worth'];
       description = json['description'];
     } catch (e) {
       print('xxx $e');
+    }
+  }
+}
+
+class Offer {
+  int current_page;
+  int last_page;
+  List<ProductOffer> productdata;
+  Offer({this.current_page, this.last_page, this.productdata});
+  Offer.fromJson(Map<String, dynamic> json) {
+    try {
+      current_page = int.parse('${json['current_page']}');
+      last_page = int.parse('${json['last_page']}');
+      productdata = [];
+      if (current_page == 1)
+        json['data'].forEach((productReport) {
+          productdata.add(ProductOffer.fromJson(productReport));
+        });
+      else {
+        int from = json['from'] - 1;
+        int to = json['to'];
+        for (int i = from; i < to; i++) {
+          //   print("item ${i}");
+          productdata.add(ProductOffer.fromJson(json['data']['${i}']));
+        }
+      }
+    } catch (e) {
+      print('catch $e');
     }
   }
 }

@@ -286,7 +286,8 @@ class _HomePageState extends State<Invoice> {
                         setState(() {
                           _productEditingController.text = '';
                         });
-                        await cart.add(CartItem(product: suggestion, qty: 1));
+                        if (suggestion.price != null)
+                          await cart.add(CartItem(product: suggestion, qty: 1));
 
                         productData.remove(suggestion);
                         updateTotal();
@@ -425,10 +426,16 @@ class _HomePageState extends State<Invoice> {
   }
 
   List<Widget> _createShoppingCartRows(BuildContext context) {
-    return cart.map((e) {
-      //total = total + (e.qty * (e.product.price));
+    /* return cart.map((e) {
       double qty = double.parse('${e.qty}');
-      //   double subtotal = e.price * qty;
+      return TableRow(children: [
+        Text('${e.product.name}'),
+        Text('${e.qty}'),
+        Text('${e.product.price}'),
+      ]);
+    }).toList();*/
+    return cart.map((e) {
+      double qty = double.parse('${e.qty}');
       return ShoppingCartRow(
         product: e.product,
         quantity: qty,

@@ -317,7 +317,7 @@ class _AddSupplier extends State<AddSupplier> {
         'city': '${cityController.text}',
         'email': '${emailController.text}',
       };
-      print('data is $data');
+      // print('data is $data');
       await Provider.of<PostProvider>(context, listen: false)
           .addSupplier(data)
           .then((response) {

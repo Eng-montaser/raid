@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/model/NewModels.dart';
@@ -113,30 +112,38 @@ class _SearchPageState extends State<SupPreviewPage> {
           elevation: 0.0,
         ),
         body: Container(
-          margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(20)),
+          margin: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(10)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('اســم المـورد:  ',
-                      style: TextStyle(
-                          fontSize: 22.0,
-                          fontFamily: GoogleFonts.cairo().fontFamily,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
-                  Text('${widget.customerData.name}',
-                      style: TextStyle(
-                          fontSize: 22.0,
-                          fontFamily: GoogleFonts.cairo().fontFamily,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black))
+                  Container(
+                    decoration: BoxDecoration(border: Border.all(width: 1)),
+                    height: ScreenUtil().setHeight(35),
+                    width: ScreenUtil().setWidth(100),
+                    child: Center(
+                      child: Text(' اسـم المورد:  ',
+                          style: FCITextStyle().normal18()),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * .5,
+                    height: ScreenUtil().setHeight(35),
+                    padding: EdgeInsets.symmetric(),
+                    decoration: BoxDecoration(border: Border.all(width: 1)),
+                    child: Center(
+                      child: Text('${widget?.customerData?.name ?? ''}',
+                          style: FCITextStyle().normal18()),
+                    ),
+                  )
                 ],
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(15),
               ),
+              rowDataHeader(),
               ListView.builder(
                 itemBuilder: (context, index) => rowData(widget.cart[index]),
                 shrinkWrap: true,
@@ -155,7 +162,7 @@ class _SearchPageState extends State<SupPreviewPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('العنوان', style: FCITextStyle().bold16()),
-                      Text('${widget.customerData.address}',
+                      Text('${widget?.customerData?.address ?? ''}',
                           style:
                               FCITextStyle(color: Colors.black54).normal14()),
                     ],
@@ -285,7 +292,7 @@ class _SearchPageState extends State<SupPreviewPage> {
                               isLoading = true;
                             });
                             var data = {
-                              'supplier_id': '${widget.customerData.id}',
+                              'supplier_id': '${widget?.customerData?.id}',
                               'warehouse_id': '${widget.warId}',
                               'qty': json.encode(qty),
                               'product_code': "$pcode",
@@ -308,14 +315,14 @@ class _SearchPageState extends State<SupPreviewPage> {
                               'shipping_cost': '${widget.shipping}',
                               'status': '${saleIndex + 1}',
                               'payment_status': '$paymentIndex',
-                              'paid_by_id': '${widget.customerData.id}',
+                              'paid_by_id': '${widget?.customerData?.id}',
                               'paid_amount': '$paidamount',
                               "recieved": json.encode(qty),
                               //"batch_no": jsonEncode([]),
                               // "expired_date": jsonEncode([]),
                               'note': ''
                             };
-                            print('data is $data');
+                            // print('data is $data');
                             await Provider.of<PostProvider>(context,
                                     listen: false)
                                 .addPurchase(data)
@@ -435,57 +442,127 @@ class _SearchPageState extends State<SupPreviewPage> {
 
   Widget rowData(CartItem cart) {
     double total = cart.qty * cart.product.price;
-    return Column(
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(1)),
+      child: Row(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width * .5,
+            height: ScreenUtil().setHeight(35),
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+            decoration: BoxDecoration(border: Border.all(width: 1)),
+            child: FittedBox(
+              child: Text(
+                '${cart.product.name}',
+                maxLines: 2,
+                softWrap: true,
+                style: FCITextStyle().bold16().copyWith(height: 1.4),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+            width: ScreenUtil().setWidth(60),
+            height: ScreenUtil().setHeight(35),
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(width: 1),
+            ),
+            child: Center(
+              child: Text('${cart.qty.toInt()}',
+                  style: FCITextStyle().bold16().copyWith(height: 1.4)),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+            //margin: EdgeInsets.all(7),
+            width: ScreenUtil().setWidth(80),
+            height: ScreenUtil().setHeight(35),
+
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(width: 1),
+            ),
+            child: Center(
+              child: Text('${cart.product.price.toStringAsFixed(2)}',
+                  style: FCITextStyle().bold16().copyWith(height: 1.4)),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+            width: ScreenUtil().setWidth(80),
+            height: ScreenUtil().setHeight(35),
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(width: 1),
+            ),
+            child: Center(
+              child: Text('${total.toStringAsFixed(2)}',
+                  style: FCITextStyle().bold16().copyWith(height: 1.4)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget rowDataHeader() {
+    return Row(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 7),
-                  //margin: EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      border: Border.all(width: 1, color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text('${cart.qty.toInt()}'),
-                ),
-                SizedBox(
-                  width: ScreenUtil().setWidth(12),
-                ),
-                Icon(
-                  Icons.clear,
-                  size: 15,
-                  color: Colors.black45,
-                ),
-                SizedBox(
-                  width: ScreenUtil().setWidth(12),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * .5,
-                  child: Text(
-                    '${cart.product.name}',
-                    maxLines: 2,
-                    softWrap: true,
-                    style: FCITextStyle().bold16().copyWith(height: 1.4),
-                  ),
-                ),
-              ],
+        Container(
+          width: MediaQuery.of(context).size.width * .5,
+          height: ScreenUtil().setHeight(35),
+          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          decoration: BoxDecoration(border: Border.all(width: 1)),
+          child: FittedBox(
+            child: Text(
+              'الصنـف',
+              maxLines: 2,
+              softWrap: true,
+              style: FCITextStyle().bold16().copyWith(height: 1.4),
             ),
-            SizedBox(
-              width: ScreenUtil().setWidth(10),
-            ),
-            Text('${total.toStringAsFixed(2)} جنيه',
-                style: FCITextStyle(color: Colors.orange).normal14()),
-          ],
+          ),
         ),
-        Divider(
-          color: Colors.grey.shade300,
-          //  height: 10,
+        Container(
+          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          width: ScreenUtil().setWidth(60),
+          height: ScreenUtil().setHeight(35),
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            border: Border.all(width: 1),
+          ),
+          child: Center(
+            child: Text('الكميـة',
+                style: FCITextStyle().bold16().copyWith(height: 1.4)),
+          ),
         ),
-        SizedBox(
-          height: ScreenUtil().setHeight(10),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          //margin: EdgeInsets.all(7),
+          width: ScreenUtil().setWidth(80),
+          height: ScreenUtil().setHeight(35),
+
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            border: Border.all(width: 1),
+          ),
+          child: Center(
+            child: Text('السعـر',
+                style: FCITextStyle().bold16().copyWith(height: 1.4)),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          width: ScreenUtil().setWidth(80),
+          height: ScreenUtil().setHeight(35),
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            border: Border.all(width: 1),
+          ),
+          child: Center(
+            child: Text('الاجمــالى',
+                style: FCITextStyle().bold16().copyWith(height: 1.4)),
+          ),
         ),
       ],
     );

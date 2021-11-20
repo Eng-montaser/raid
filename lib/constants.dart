@@ -10,7 +10,7 @@ const String BaseUrl = 'http://hrms.fsdmarketing.com/api/v1/';
 
 //String Culture = 'en';
 const String MAPAPIKEY = 'AIzaSyCdVIteMWFxbV6WMKh-8FopoExTanQCCIg';
-const String kLogo = "assets/images/logo_white.png";
+const String kLogo = "assets/images/white.png";
 const String kLogoBlack = "assets/images/logo_black.png";
 const primaryColor = Color(0xffff0d0d);
 const accentColor = Color(0xff77838f);

@@ -55,7 +55,7 @@ class _HomePageState extends State<SupInvoice> {
     total = 0;
     for (var c in cart) {
       total = total + (c.product.price * c.qty);
-      print('${c.qty}');
+      // print('${c.qty}');
     }
     if (shippingController.text.isNotEmpty &&
         !shippingController.text.contains('-')) {
@@ -171,7 +171,7 @@ class _HomePageState extends State<SupInvoice> {
                         List<SuppliersData> data = [];
                         supplierData.forEach((element) {
                           if (element.name.contains(pattern)) data.add(element);
-                          print(pattern);
+                          //print(pattern);
                         });
                         //   FocusManager.instance.primaryFocus.unfocus();
 
@@ -240,7 +240,7 @@ class _HomePageState extends State<SupInvoice> {
                         List<ProductData> data = [];
                         productData.forEach((element) {
                           if (element.name.contains(pattern)) data.add(element);
-                          print(pattern);
+                          //  print(pattern);
                         });
                         //  FocusManager.instance.primaryFocus.unfocus();
                         return data;
@@ -270,7 +270,8 @@ class _HomePageState extends State<SupInvoice> {
                         setState(() {
                           _productEditingController.text = '';
                         });
-                        await cart.add(CartItem(product: suggestion, qty: 1));
+                        if (suggestion.price != null)
+                          await cart.add(CartItem(product: suggestion, qty: 1));
 
                         productData.remove(suggestion);
                         updateTotal();

@@ -41,7 +41,7 @@ class _ProductReportState extends State<ProductReport> {
           .getWarehousesData()
           .then((value) {
         value.forEach((element) {
-          print(element.wId);
+         // print(element.wId);
         });
         setState(() {
           _warehousesDataList = value;

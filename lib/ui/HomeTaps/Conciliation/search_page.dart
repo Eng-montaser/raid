@@ -30,7 +30,7 @@ class _ConcSearch extends State<ConcSearch> {
   List<String> searchBrands = [];
   List<Integrations> searchIntegr = [];
   List<String> tempsearchResult = [];
-
+  bool isLoadingbrand = true, isLoadingmodel = true;
   @override
   void initState() {
     super.initState();
@@ -45,8 +45,16 @@ class _ConcSearch extends State<ConcSearch> {
 
         //  });
       });*/
-      searchBrands = await Provider.of<GetProvider>(context, listen: false)
-          .getSearchBrand(widget.data.id);
+      await Provider.of<GetProvider>(context, listen: false)
+          .getSearchBrand(widget.data.id)
+          .then((value) {
+        if (value != null) {
+          setState(() {
+            searchBrands = value;
+            isLoadingbrand = false;
+          });
+        }
+      });
     });
   }
 
@@ -54,6 +62,7 @@ class _ConcSearch extends State<ConcSearch> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white.withOpacity(.9),
         appBar: AppBar(
           centerTitle: true,
           title: Text(
@@ -80,41 +89,51 @@ class _ConcSearch extends State<ConcSearch> {
           ],
         ),
         body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              searchBrands.length > 0
-                  ? getBrands(searchBrands)
-                  : Text('تحميل...'),
-              searchIntegr.length > 0
-                  ? getModels(searchIntegr)
-                  : _brandEditingController.text.isNotEmpty
-                      ? Text('تحميل...')
-                      : Container(),
-              SizedBox(
-                height: ScreenUtil().setHeight(10),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  itemBuilder: (context, index) => Card(
-                    margin: EdgeInsets.symmetric(
-                        horizontal: ScreenUtil().setWidth(15)),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+              image: AssetImage('assets/images/white.png'),
+              scale: 3,
+            )),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                /*searchBrands.length > 0
+                    ?*/
+                getBrands(searchBrands),
+                /* : Text('تحميل...'),
+                searchIntegr.length > 0
+                    ? */
+                getModels(searchIntegr)
+                /*  : _brandEditingController.text.isNotEmpty
+                        ? Text('تحميل...')
+                        : Container()*/
+                ,
+                SizedBox(
+                  height: ScreenUtil().setHeight(10),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    itemBuilder: (context, index) => Card(
+                      margin: EdgeInsets.symmetric(
                           horizontal: ScreenUtil().setWidth(15)),
-                      child: Text(
-                        '${searchResult[index]}',
-                        style: FCITextStyle(color: primaryColor).bold20(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil().setWidth(15)),
+                        child: Text(
+                          '${searchResult[index]}',
+                          style: FCITextStyle(color: primaryColor).bold20(),
+                        ),
                       ),
                     ),
+                    shrinkWrap: true,
+                    itemCount: searchResult.length,
                   ),
-                  shrinkWrap: true,
-                  itemCount: searchResult.length,
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
         bottomSheet: InkWell(
@@ -179,6 +198,7 @@ class _ConcSearch extends State<ConcSearch> {
           );
         },
         textFieldConfiguration: TextFieldConfiguration(
+            enabled: !isLoadingbrand,
             style: FCITextStyle(color: primaryColor).normal18().copyWith(),
             decoration: InputDecoration(
               suffixIcon: Icon(Icons.keyboard_arrow_down_sharp),
@@ -190,10 +210,21 @@ class _ConcSearch extends State<ConcSearch> {
         onSuggestionSelected: (suggestion) async {
           setState(() {
             _brandEditingController.text = suggestion;
+            _modelEditingController.text = '';
             brandData = suggestion;
+            isLoadingmodel = true;
+            searchResult = [];
           });
-          searchIntegr = await Provider.of<GetProvider>(context, listen: false)
-              .getSearchModel(suggestion, widget.data.id);
+          await Provider.of<GetProvider>(context, listen: false)
+              .getSearchModel(suggestion, widget.data.id)
+              .then((value) {
+            if (value != null) {
+              setState(() {
+                searchIntegr = value;
+                isLoadingmodel = false;
+              });
+            }
+          });
           //setData();
           //   print(suggestion.name);
         },
@@ -220,7 +251,7 @@ class _ConcSearch extends State<ConcSearch> {
             if (element.name.toUpperCase().contains(pattern.toUpperCase()))
               data.add(element);
 
-            print(pattern);
+            //print(pattern);
           });
           return data;
         },
@@ -238,6 +269,7 @@ class _ConcSearch extends State<ConcSearch> {
         },
         textFieldConfiguration: TextFieldConfiguration(
             style: FCITextStyle(color: primaryColor).normal18().copyWith(),
+            enabled: !isLoadingmodel,
             decoration: InputDecoration(
                 suffixIcon: Icon(Icons.keyboard_arrow_down_sharp),
                 labelText: 'اختر الموديل من هنا',

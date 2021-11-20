@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/provider/GetProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
+import 'package:raid/ui/HomeTaps/ProductsScreen/SearchPage.dart';
 import 'package:raid/widget/CustomWidgets.dart';
 import 'package:raid/widget/rounded_input_field.dart';
 
@@ -20,20 +21,60 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
+  bool isLoading2 = false;
+  ScrollController controller;
+
   @override
   void initState() {
     super.initState();
+    controller = ScrollController()..addListener(_scrollListener);
   }
 
-  changeProducts() async {
+  changeProducts(int page) async {
+    setState(() {
+      isLoading2 = page == 1 ? false : true;
+    });
     selectedCat == 0
-        ? await Provider.of<GetProvider>(context, listen: false).getProducts()
+        ? await Provider.of<GetProvider>(context, listen: false)
+            .getProducts(page)
         : await Provider.of<GetProvider>(context, listen: false)
-            .getProductById(selectedCat);
+            .getProductById(selectedCat, page);
+    setState(() {
+      isLoading2 = false;
+    });
   }
 
   int selectedCat = 0;
   int selectedIndex = 0;
+  @override
+  void dispose() {
+    controller.removeListener(_scrollListener);
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    // print(controller.position.pixels);
+    // if (controller.position.extentAfter < searchProducts.productdata.length &&
+    //   searchProducts.current_page + 1 <= searchProducts.last_page)
+    // getData(searchController.text, searchProducts.current_page + 1);
+  }
+  bool onNotification(ScrollEndNotification t) {
+    if (t.metrics.pixels > 0 && t.metrics.atEdge) {
+      if (Provider.of<GetProvider>(context, listen: false)
+                  .mproducts
+                  .current_page +
+              1 <=
+          Provider.of<GetProvider>(context, listen: false).mproducts.last_page)
+        changeProducts(Provider.of<GetProvider>(context, listen: false)
+                .mproducts
+                .current_page +
+            1);
+    } else {
+      print('I am at the start');
+    }
+    ;
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +89,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
             padding: EdgeInsets.symmetric(
                 vertical: ScreenUtil().setHeight(5),
                 horizontal: ScreenUtil().setWidth(60)),
-            child: CustomTextInput(
-              obscure: false,
-              enabled: false,
-              suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
-              hintText: 'search'.tr(),
-              leading: Icons.filter_alt_sharp,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => SearchProduct()));
+              },
+              child: CustomTextInput(
+                obscure: false,
+                enabled: false,
+                suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
+                hintText: 'search'.tr(),
+                leading: Icons.filter_alt_sharp,
+              ),
             ),
           ),
           widget.loading
@@ -77,15 +124,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: ScreenUtil().setWidth(
-                                              selectedIndex == index
-                                                  ? 20
-                                                  : 5)),
+                                              selectedIndex == index ? 20 : 5)),
                                       child: InkWell(
                                         onTap: () {
                                           setState(() {
                                             selectedCat = 0;
                                             selectedIndex = 0;
-                                            changeProducts();
+                                            changeProducts(1);
                                           });
                                         },
                                         child: Container(
@@ -169,18 +214,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: ScreenUtil().setWidth(
-                                              selectedIndex == index
-                                                  ? 10
-                                                  : 5)),
+                                              selectedIndex == index ? 10 : 5)),
                                       child: InkWell(
                                         onTap: () {
-                                          print("Cat ${provider.catProducts[index - 1].name}" );
+                                          print(
+                                              "Cat ${provider.catProducts[index - 1].name}");
                                           setState(() {
                                             selectedIndex = index;
                                             selectedCat = provider
                                                 .catProducts[index - 1]
                                                 .categoryId;
-                                            changeProducts();
+                                            changeProducts(1);
                                           });
                                         },
                                         child: Container(
@@ -243,7 +287,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                '${provider.catProducts[index - 1].name ?? ''}',textAlign: TextAlign.center,
+                                                '${provider.catProducts[index - 1].name ?? ''}',
+                                                textAlign: TextAlign.center,
                                                 style: selectedIndex == index
                                                     ? FCITextStyle(
                                                             color: primaryColor)
@@ -264,14 +309,27 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 ),
           Container(
             height: size.height * 3 / 5 - ScreenUtil().setHeight(20),
-            child: provider?.busy
+            child: provider?.busy && provider?.products?.length == 0
                 ? loadingTow(100)
-                : provider.products.length>0?ListView.builder(
-                    itemCount: provider.products.length,
-                    itemBuilder: (context, index) => ProductCard(
-                          productData: provider.products[index],
-                        ))
-            :Center(child: Text("لا يوجد نتائج",style: FCITextStyle().normal18(),),),
+                : provider.products.length > 0
+                    ? NotificationListener<ScrollEndNotification>(
+                        onNotification: onNotification,
+                        child: ListView.builder(
+                            itemCount: provider.products.length,
+                            itemBuilder: (context, index) =>
+                                index == provider.products.length - 1 &&
+                                        isLoading2
+                                    ? loadingTow(50)
+                                    : ProductCard(
+                                        productData: provider.products[index],
+                                      )),
+                      )
+                    : Center(
+                        child: Text(
+                          "لا يوجد نتائج",
+                          style: FCITextStyle().normal18(),
+                        ),
+                      ),
           ),
         ],
       ),

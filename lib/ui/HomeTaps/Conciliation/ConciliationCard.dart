@@ -64,7 +64,7 @@ class _ConciliationCardState extends State<ConciliationCard> {
                         CustomWidgets().CustomImage(
                           width: ScreenUtil().setWidth(120),
                           height: ScreenUtil().setHeight(120),
-                          assetsImagePath: 'assets/images/place.png',
+                          assetsImagePath: 'assets/images/white.png',
                           networkImageUrl: conciliationData.image,
                         )
                       ],

@@ -71,7 +71,7 @@ class ProductReportDataList {
       int from = json['from'] - 1;
       int to = json['to'];
       for (int i = from; i < to; i++) {
-        print("item ${i}");
+        //   print("item ${i}");
         productReportDataList
             .add(ProductReportData.fromJson(json['data']['${i}']));
       }

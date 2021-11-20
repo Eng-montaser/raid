@@ -14,7 +14,6 @@ import 'package:raid/widget/rounded_input_field.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import 'ConciliationCard.dart';
-import 'ConciliationDetailsCard.dart';
 
 class ConciliationScreen extends StatefulWidget {
   @override
@@ -25,15 +24,15 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
   //List<ConciliationData> conciliationData = [];
   ScrollController _scrollController = ScrollController();
   TextEditingController searchController = TextEditingController(text: '');
-  List<ConciliationData> temp = [], temp2 = [];
+  //List<ConciliationData> temp = [], temp2 = [];
   ConciliationData searchConciliationData;
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      temp = await Provider.of<GetProvider>(context, listen: false)
-          .getIntegrations();
+      /*  temp = await Provider.of<GetProvider>(context, listen: false)
+          .getIntegrations();*/
     });
     searchController.addListener(() {
       setState(() {
@@ -64,7 +63,7 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
             ? loading()
             : ListView.builder(
                 controller: _scrollController,
-                itemCount: temp.length + 1,
+                itemCount: getProvider.conciliationData.length + 1,
                 itemBuilder: (context, index) => index == 0
                     ? !moreDetails
                         ? Column(
@@ -126,34 +125,38 @@ class _ConciliationScreenState extends State<ConciliationScreen> {
                     : Padding(
                         padding: EdgeInsets.symmetric(
                             vertical: ScreenUtil().setHeight(20)),
-                        child: !moreDetails
-                            ? ConciliationCard(
-                                conciliationData:
-                                    getProvider.conciliationData[index - 1],
-                                isOdd: index % 2 == 0 ? false : true,
-                                moreChange: (val) {
-                                  setState(() {
+                        child: /* !moreDetails
+                            ? */
+                            ConciliationCard(
+                          conciliationData:
+                              getProvider.conciliationData[index - 1],
+                          isOdd: index % 2 == 0 ? false : true,
+                          moreChange: (val) {
+                            /* setState(() {
                                     moreDetails = val;
                                     searchConciliationData =
                                         getProvider.conciliationData[index - 1];
                                   });
-//                                  if (val) {
-//                                    _scrollController.animateTo(
-//                                        _scrollController.offset + 200,
-//                                        duration: Duration(milliseconds: 500),
-//                                        curve: Curves.ease);
-//                                  }
-                                },
-                              )
-                            : ConciliationDetailsCard(
-                                conciliationData: temp[index - 1]
-                                    .integrations
+//                                  */
+                            if (getProvider.conciliationData[index - 1] != null)
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => ConcSearch(
+                                        data: getProvider
+                                            .conciliationData[index - 1],
+                                      )));
+                          },
+                        )
+                        /*: ConciliationDetailsCard(
+                                conciliationData: getProvider
+                                    .conciliationData[index - 1].integrations
                                     .where((element) => element.tags
                                         .contains(searchController.text))
                                     .toList(),
-                                name: temp[index - 1].name,
+                                name: getProvider
+                                    .conciliationData[index - 1].name,
                                 searchText: searchtext,
-                              ))),
+                              )*/
+                        )),
       ),
       bottomSheet: Container(
           width: size.width,

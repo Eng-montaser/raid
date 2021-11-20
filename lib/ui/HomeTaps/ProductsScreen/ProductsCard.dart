@@ -10,7 +10,9 @@ import 'package:raid/widget/CustomWidgets.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductData productData;
-  const ProductCard({Key key, this.productData}) : super(key: key);
+  final bool isSearch;
+  const ProductCard({Key key, this.productData, this.isSearch = false})
+      : super(key: key);
   @override
   _ProductCardState createState() => _ProductCardState();
 }
@@ -20,7 +22,7 @@ class _ProductCardState extends State<ProductCard> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height * 2 / 7,
+      height: widget.isSearch ? size.height * 2 / 8 : size.height * 2 / 7,
       width: size.width,
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -56,6 +58,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         Expanded(
                           child: Column(
+                            // mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -66,97 +69,100 @@ class _ProductCardState extends State<ProductCard> {
                                 widget.productData.category,
                                 style: FCITextStyle().normal16(),
                               ),
-                              Expanded(
-                                child: FittedBox(
-                                  child: Container(
-                                      width: ScreenUtil().setWidth(280),
-                                      height: ScreenUtil().setWidth(100),
-                                      child: Html(
-                                        data: widget.productData.description,
-                                      )
+                              if (widget.productData.description != null)
+                                Expanded(
+                                  child: FittedBox(
+                                    child: Container(
+                                        width: ScreenUtil().setWidth(280),
+                                        height: ScreenUtil().setWidth(100),
+                                        child: Html(
+                                          data: widget.productData.description,
+                                        )
 //                                Text(
 //                                  ,
 //                                  style: FCITextStyle().normal13(),
 //                                )
-                                      ),
+                                        ),
+                                  ),
                                 ),
-                              ),
                               SizedBox(
                                 height: ScreenUtil().setHeight(5),
                               ),
-                              Text(
-                                "${widget.productData.price.toString()} جنيه",
-                                style:
-                                    FCITextStyle(color: Colors.red).normal13(),
-                              )
+                              if (widget.productData.price != null)
+                                Text(
+                                  "${widget.productData.price.toString()} جنيه",
+                                  style: FCITextStyle(color: Colors.red)
+                                      .normal13(),
+                                )
                             ],
                           ),
                         )
                       ],
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(5),
-                            bottomRight: Radius.circular(5))),
-                    width: size.width,
-                    height: ScreenUtil().setHeight(35),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.favorite_outlined,
-                                color: Colors.red,
-                                size: ScreenUtil().setWidth(20),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text("125")
-                            ],
+                  if (!widget.isSearch)
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(5),
+                              bottomRight: Radius.circular(5))),
+                      width: size.width,
+                      height: ScreenUtil().setHeight(35),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          InkWell(
+                            onTap: () {},
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.favorite_outlined,
+                                  color: Colors.red,
+                                  size: ScreenUtil().setWidth(20),
+                                ),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Text("125")
+                              ],
+                            ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {},
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.bookmark,
-                                color: AccentColor,
-                                size: ScreenUtil().setWidth(20),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text("Save")
-                            ],
+                          InkWell(
+                            onTap: () {},
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.bookmark,
+                                  color: AccentColor,
+                                  size: ScreenUtil().setWidth(20),
+                                ),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Text("Save")
+                              ],
+                            ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {},
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.share,
-                                color: AccentColor,
-                                size: ScreenUtil().setWidth(20),
-                              ),
-                              SizedBox(
-                                width: ScreenUtil().setWidth(5),
-                              ),
-                              Text("Share".tr())
-                            ],
+                          InkWell(
+                            onTap: () {},
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.share,
+                                  color: AccentColor,
+                                  size: ScreenUtil().setWidth(20),
+                                ),
+                                SizedBox(
+                                  width: ScreenUtil().setWidth(5),
+                                ),
+                                Text("Share".tr())
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                        ],
+                      ),
+                    )
                 ],
               ),
             ),

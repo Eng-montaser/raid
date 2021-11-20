@@ -41,22 +41,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           catLoading = false;
         });
       });
-      await Provider.of<GetProvider>(context, listen: false).getProducts();
+      await Provider.of<GetProvider>(context, listen: false).getProducts(1);
 
       ///Cat And Conciliation ---------------------------------
       await Provider.of<GetProvider>(context, listen: false).getIntegrations();
 
       ///Cat And Offers --------------------------------------
-      await Provider.of<GetProvider>(context, listen: false).getOffers();
+      await Provider.of<GetProvider>(context, listen: false).getOffers(1);
 
       ///Cat And Brands --------------------------------------
-      await Provider.of<GetProvider>(context, listen: false).getBrands();
+      // await Provider.of<GetProvider>(context, listen: false).getBrands();
 
       ///Cat And Service --------------------------------------
       await Provider.of<GetProvider>(context, listen: false).getService();
 
       ///Cat And Videos --------------------------------------
-      await Provider.of<GetProvider>(context, listen: false).getVideos();
+      //   await Provider.of<GetProvider>(context, listen: false).getVideos();
 
       ///Cat And Codes --------------------------------------
       await Provider.of<GetProvider>(context, listen: false).getCodes();
