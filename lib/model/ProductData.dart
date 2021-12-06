@@ -55,7 +55,7 @@ class ProductData {
   String stock_worth;
   double offer;
   String description;
-
+  int test = 0;
   ProductData(
       {this.productId,
       this.key,
@@ -80,14 +80,17 @@ class ProductData {
       code = json['code'];
       brand = json['brand'];
       category = json['category'];
-      qty = json['qty'].toString().replaceAll(' ', '') != null
+      qty = json['qty'] != null &&
+              json['qty']?.toString()?.replaceAll(' ', '').isNotEmpty
           ? double.parse('${json['qty'].toString().replaceAll(' ', '')}')
           : 1.0;
       unit = json['unit'];
       price = json['price'] != null && json['price'].toString().isNotEmpty
           ? double.parse('${json['price']}')
           : 1.0;
-      cost = double.parse('${json['cost']}');
+      cost = json['cost'] != null && json['cost'].toString().isNotEmpty
+          ? double.parse('${json['cost']}')
+          : 1.0;
       stock_worth = json['stock_worth'];
       description = json['description'];
     } catch (e) {

@@ -140,7 +140,7 @@ class _ContactUsState extends State<ContactUs> {
                                           fit: BoxFit.fitWidth,
 //
                                           child: Text(
-                                            getProvider.settingData.address,
+                                            getProvider.settingData?.address,
                                             style: FCITextStyle().normal18(),
                                           )),
                                     )

@@ -22,8 +22,11 @@ class _CodeCardState extends State<CodeCard> {
     return Container(
       // height: size.height * 2 / 7,
       width: size.width,
-      child: widget.codeData.description
-                  .where((element) => element.contains(widget.searchText))
+      child: widget
+                  .codeData
+                  .description
+                  /* .where((element) => element.contains(widget.searchText))
+                 */
                   .length >
               0
           ? Padding(
@@ -60,9 +63,12 @@ class _CodeCardState extends State<CodeCard> {
                     )),*/
                     Column(
                       children: List.generate(
-                          widget.codeData.description
-                              .where((element) =>
+                          widget
+                              .codeData
+                              .description
+                              /* .where((element) =>
                                   element.contains('${widget.searchText}'))
+                              */
                               .length,
                           (index) => HighlightText(
                                 text:

@@ -21,17 +21,25 @@ class SearchProduct extends StatefulWidget {
 class _SearchProductState extends State<SearchProduct> {
   TextEditingController searchController = TextEditingController(text: '');
   Product searchProducts;
-  List<ProductData> productList = [];
+  List<ProductData> productList = [], fetchedPrdctList = [];
   bool isLoading = false;
   bool isLoading2 = false;
   ScrollController controller;
   @override
   void initState() {
     super.initState();
+
     controller = ScrollController()..addListener(_scrollListener);
     searchController.addListener(() {
-      if (searchController.text.isEmpty) searchProducts = null;
+      if (searchController.text.isEmpty) {
+        searchProducts = null;
+        productList = [];
+      } else {}
     });
+    /*WidgetsBinding.instance.addPostFrameCallback((_) async {
+      fetchedPrdctList = await Provider.of<GetProvider>(context, listen: false)
+          .getAllProducts();
+    });*/
   }
 
   @override

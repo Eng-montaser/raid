@@ -37,8 +37,8 @@ class GetService extends BaseApi {
     return await api.httpGet('integrations');
   }
 
-  Future<http.Response> getCodes() async {
-    return await api.httpGet('codes');
+  Future<http.Response> getCodes(String text) async {
+    return await api.httpGet('codes', query: {'search': '$text'});
   }
 
   Future<http.Response> getVideos() async {

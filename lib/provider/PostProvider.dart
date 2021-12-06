@@ -106,25 +106,29 @@ class PostProvider extends BaseProvider {
     return result;
   }
 
-  Future<bool> addsale(var datas) async {
-    bool result = false;
+  Future<dynamic> addsale(var datas) async {
     setBusy(true);
+    var data;
     try {
       var response = await _postService.addSale(datas);
-      var data = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
-        result = true;
+        data = jsonDecode(response.body);
+        print('${data}');
         notifyListeners();
         setBusy(false);
+        //return data;
       }
     } catch (e) {
       print(e);
       setBusy(false);
     }
     setBusy(false);
-    return result;
+    return data;
   }
 
+/*{message:  Sale created successfully,
+invoice: {variant_id: null, product_batch_id: null, sale_id: 5, product_id: 1, qty: 1, sale_unit_id: 1, net_unit_price: 0, discount: 0, tax_rate: 0, tax: 0, total: 122, updated_at: 2021-11-25 01:24:47, created_at: 2021-11-25 01:24:47, id: 11}}*/
   Future<bool> addPurchase(var datas) async {
     bool result = false;
     setBusy(true);

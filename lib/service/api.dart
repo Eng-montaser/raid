@@ -15,9 +15,10 @@ class Api {
   ///  Temporrary*****************************************
 
   ///*****************************************************
-  // String baseUrl = 'fsdmarketing.com';
+  //String baseUrl = 'fsdmarketing.com';
   String baseUrl = 'ar-akgroup.com';
   String path = '/api';
+  // String path = '/alraayid/api';
 
   Future<http.Response> httpGet(String endPath,
       {Map<String, String> query}) async {

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/provider/GetProvider.dart';
+import 'package:raid/widget/rounded_button.dart';
 import 'package:raid/widget/rounded_input_field.dart';
 
 import 'CodeCard.dart';
@@ -25,49 +26,73 @@ class _CodeScreenState extends State<CodeScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var provider = Provider.of<GetProvider>(context, listen: false);
-    return provider.busy
-        ? loading()
-        : ListView.builder(
-            itemCount: provider.codesData.length + 1,
-            itemBuilder: (context, index) {
-              if (searchController.text.isEmpty) {
-                if (index == 0)
-                  return Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(10),
-                          horizontal: ScreenUtil().setWidth(100)),
-                      child: CustomTextInput(
-                        obscure: false,
-                        controller: searchController,
-                        suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
-                        hintText: 'search'.tr(),
-                        leading: Icons.filter_alt_sharp,
-                      ));
-                else
-                  CodeCard(
-                    codeData: provider.codesData[index - 1],
-                    searchText: searchController.text,
-                  );
-              } else {
-                if (index == 0)
-                  return Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: ScreenUtil().setHeight(10),
-                          horizontal: ScreenUtil().setWidth(100)),
-                      child: CustomTextInput(
-                        obscure: false,
-                        controller: searchController,
-                        suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
-                        hintText: 'search'.tr(),
-                        leading: Icons.filter_alt_sharp,
-                      ));
-                else
-                  CodeCard(
-                    codeData: provider.codesData[index - 1],
-                    searchText: searchController.text,
-                  );
-              }
-            });
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: EdgeInsets.symmetric(
+              vertical: ScreenUtil().setHeight(5),
+              horizontal: ScreenUtil().setWidth(15)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CustomTextInput(
+                // obscure: false,
+                //  enabled: false,
+                suffixicon: Icon(Icons.search),
+                hintText: 'search'.tr(),
+                controller: searchController,
+                userTyped: (val) {
+                  if (val.toString().isEmpty) provider.getCodes();
+                },
+                leading: null,
+              ),
+              if (searchController.text.isNotEmpty)
+                RoundedButton(
+                  text: 'بحث',
+                  color: primaryColor,
+                  onTap: () async {
+                    provider.getCodes(text: searchController.text);
+                  },
+                ),
+            ],
+          ),
+        ),
+        provider.busy
+            ? loading()
+            : Expanded(
+                child: ListView.builder(
+                    itemCount: provider.codesData.length,
+                    itemBuilder: (context, index) {
+                      //   if (searchController.text.isEmpty) {
+
+                      return CodeCard(
+                        codeData: provider.codesData[index],
+                        searchText: searchController.text,
+                      );
+                      /* } else {
+                      if (index == 0)
+                        return Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: ScreenUtil().setHeight(10),
+                                horizontal: ScreenUtil().setWidth(100)),
+                            child: CustomTextInput(
+                              obscure: false,
+                              controller: searchController,
+                              suffixicon: Icon(Icons.keyboard_arrow_down_sharp),
+                              hintText: 'search'.tr(),
+                              leading: Icons.filter_alt_sharp,
+                            ));
+                      else
+                        CodeCard(
+                          codeData: provider.codesData[index - 1],
+                          searchText: searchController.text,
+                        );
+                    }*/
+                    }),
+              ),
+      ],
+    );
   }
 }
 

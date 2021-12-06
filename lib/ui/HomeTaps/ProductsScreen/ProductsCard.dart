@@ -88,7 +88,7 @@ class _ProductCardState extends State<ProductCard> {
                               SizedBox(
                                 height: ScreenUtil().setHeight(5),
                               ),
-                              if (widget.productData.price != null)
+                              if (widget?.productData?.price != null)
                                 Text(
                                   "${widget.productData.price.toString()} جنيه",
                                   style: FCITextStyle(color: Colors.red)

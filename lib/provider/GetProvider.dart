@@ -377,16 +377,17 @@ class GetProvider extends BaseProvider {
   }
 
   ///Cat And Codes --------------------------------------
-  Future<List<CodeData>> getCodes() async {
+  Future<List<CodeData>> getCodes({String text = ''}) async {
     setBusy(true);
     try {
-      var response = await _getService.getCodes();
-
+      var response = await _getService.getCodes(text);
       if (response.statusCode == 201) {
         var data = jsonDecode(response.body);
         _codesData = [];
+
         data['all_search_data']
             .forEach((product) => _codesData.add(CodeData.fromJson(product)));
+
         notifyListeners();
         setBusy(false);
       }
@@ -439,6 +440,7 @@ class GetProvider extends BaseProvider {
     try {
       var response = await _getService.getCustomers();
       var data = jsonDecode(response.body);
+      print('${response.body}');
       if (response.statusCode == 201) {
         _customersData = [];
         data.forEach((customer) {
