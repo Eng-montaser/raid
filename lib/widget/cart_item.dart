@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/model/ProductData.dart';
@@ -14,13 +15,14 @@ class ShoppingCartRow extends StatefulWidget {
     @required this.quantity,
     //  @required this.subtotal,
     this.onRemove,
-    this.onChangeQuantity,
+    this.onChange,
   });
 
   final ProductData product;
   final double quantity;
 //  final double subtotal;
-  final Function onChangeQuantity;
+  final Function onChange;
+
   final VoidCallback onRemove;
 
   @override
@@ -29,16 +31,19 @@ class ShoppingCartRow extends StatefulWidget {
 
 class _ShoppingCartRowState extends State<ShoppingCartRow> {
   double subtotal = 0.0;
+  double price = 0.0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    price = widget.product.price;
     subtotal = widget.quantity * widget.product.price;
+    widget.onChange(widget.quantity, subtotal);
   }
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    // var theme = Theme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -78,9 +83,39 @@ class _ShoppingCartRowState extends State<ShoppingCartRow> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('السعر ${widget.product.price}',
-                                      style: FCITextStyle(color: Colors.orange)
-                                          .normal14()),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('السعر ',
+                                          style:
+                                              FCITextStyle(color: Colors.orange)
+                                                  .normal14()),
+                                      Container(
+                                        width: ScreenUtil().setWidth(80),
+                                        child: TextFormField(
+                                          textAlign: TextAlign.center,
+                                          initialValue: "${price}",
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  signed: false),
+                                          onChanged: (val) {
+                                            if (val.isNotEmpty) {
+                                              print('price is ${val}');
+                                              widget.onChange(
+                                                  widget.quantity,
+                                                  widget.quantity *
+                                                      double.parse(val));
+                                              setState(() {
+                                                price = double.parse(val);
+                                                subtotal = widget.quantity *
+                                                    double.parse(val);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                   Text(
                                     'إجمالى الصنف  ${(subtotal).toStringAsFixed(2)}',
                                     style: FCITextStyle(color: Colors.orange)
@@ -90,7 +125,7 @@ class _ShoppingCartRowState extends State<ShoppingCartRow> {
                               ),
                               SizedBox(height: ScreenUtil().setHeight(10)),
                               QuantitySelection(
-                                enabled: widget.onChangeQuantity != null,
+                                enabled: widget.onChange != null,
                                 width: ScreenUtil().setWidth(60),
                                 height: ScreenUtil().setHeight(30),
                                 color: Theme.of(context).accentColor,
@@ -100,9 +135,9 @@ class _ShoppingCartRowState extends State<ShoppingCartRow> {
                                     : 100,
                                 value: widget.quantity,
                                 onChanged: (val) {
-                                  widget.onChangeQuantity(val);
+                                  widget.onChange(val, val * price);
                                   setState(() {
-                                    subtotal = val * widget.product.price;
+                                    subtotal = val * price;
                                   });
                                 },
                                 useNewDesign: true,

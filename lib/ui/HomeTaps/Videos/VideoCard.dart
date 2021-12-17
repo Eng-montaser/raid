@@ -19,7 +19,7 @@ class _VideoCardState extends State<VideoCard> {
       initialVideoId: YoutubePlayer.convertUrlToId(widget.videoData.url),
       flags: const YoutubePlayerFlags(
         mute: false,
-        autoPlay: true,
+        autoPlay: false,
         disableDragSeek: false,
         loop: false,
         isLive: false,
@@ -46,45 +46,57 @@ class _VideoCardState extends State<VideoCard> {
     Size size = MediaQuery.of(context).size;
     return Container(
       width: size.width,
-      height: size.height / 3,
-      child: Center(
-          child: YoutubePlayer(
-        controller: _controller,
-        showVideoProgressIndicator: true,
-        progressIndicatorColor: Colors.blueAccent,
-        topActions: <Widget>[
-          const SizedBox(width: 8.0),
-          Expanded(
-            child: Text(
-              _controller.metadata.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
+      // height: size.height / 3,
+      child: Column(
+        children: [
+          Text(
+            "${widget.videoData.title}",
+            style: const TextStyle(
+              //color: Colors.white,
+              fontSize: 18.0,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+          YoutubePlayer(
+            controller: _controller,
+            showVideoProgressIndicator: true,
+            progressIndicatorColor: Colors.blueAccent,
+            topActions: <Widget>[
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: Text(
+                  _controller.metadata.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.settings,
-              color: Colors.white,
-              size: 25.0,
-            ),
-            onPressed: () {
+              IconButton(
+                icon: const Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                  size: 25.0,
+                ),
+                onPressed: () {
 //                log('Settings Tapped!');
-            },
-          ),
-        ],
-        onReady: () {
+                },
+              ),
+            ],
+            onReady: () {
 //            _isPlayerReady = true;
-        },
-        onEnded: (data) {
+            },
+            onEnded: (data) {
 //            _controller
 //                .load(_ids[(_ids.indexOf(data.videoId) + 1) % _ids.length]);
 //            _showSnackBar('Next Video Started!');
-        },
-      )),
+            },
+          ),
+        ],
+      ),
     );
   }
 }

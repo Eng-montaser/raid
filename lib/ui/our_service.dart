@@ -9,9 +9,8 @@ import 'package:raid/constants.dart';
 import 'package:raid/model/SettingData.dart';
 import 'package:raid/style/FCITextStyles.dart';
 import 'package:raid/ui/Home.dart';
-import 'package:raid/ui/Profile/CustomerProfile.dart';
-import 'package:raid/widget/background.dart';
 import 'package:raid/ui/Profile/Profile.dart';
+import 'package:raid/widget/background.dart';
 
 class OurService extends StatefulWidget {
   OurService({Key key}) : super(key: key);
@@ -59,7 +58,7 @@ class _OurService extends State<OurService> {
     },
     {
       'category': "myservices",
-      'image': "assets/images/bank.png",
+      'image': "assets/images/mobiles.jpeg",
       'id': 4,
     },
     {
@@ -98,11 +97,9 @@ class _OurService extends State<OurService> {
                   children: [
                     Container(),
                     InkWell(
-                      onTap: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Profile()));
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Profile()));
                       },
                       child: CircleAvatar(
                         child: Image.asset('assets/images/man-300x300.png'),

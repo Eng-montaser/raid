@@ -157,11 +157,16 @@ class ProductOffer {
 class CartItem {
   double qty;
   final ProductData product;
+  double subtotal;
   setCart(double qt) {
     this.qty = qt;
   }
 
-  CartItem({this.qty, this.product});
+  setSubTotal(double total) {
+    this.subtotal = total;
+  }
+
+  CartItem({this.qty, this.product, this.subtotal});
 }
 
 /*class Brand {
@@ -196,5 +201,47 @@ class Unit {
     unit_name = json['unit_name'] ?? '';
     is_active = int.parse('${json['is_active']}');
     operation_value = int.parse('${json['operation_value']}');
+  }
+}
+
+class Mobile {
+  int id;
+  String title;
+  String image;
+  String description;
+  Mobile({this.id, this.title, this.image, this.description});
+  Mobile.fromJson(Map<String, dynamic> json) {
+    id = int.parse('${json['id']}');
+    title = json['title'] ?? '';
+    image = json['image'];
+    description = '${json['description']}';
+  }
+}
+
+class MMobile {
+  int current_page;
+  int last_page;
+  List<Mobile> productdata;
+  MMobile({this.current_page, this.last_page, this.productdata});
+  MMobile.fromJson(Map<String, dynamic> json) {
+    try {
+      current_page = int.parse('${json['current_page']}');
+      last_page = int.parse('${json['last_page']}');
+      productdata = [];
+      if (current_page == 1)
+        json['data'].forEach((productReport) {
+          productdata.add(Mobile.fromJson(productReport));
+        });
+      else {
+        int from = json['from'] - 1;
+        int to = json['to'];
+        for (int i = from; i < to; i++) {
+          //   print("item ${i}");
+          productdata.add(Mobile.fromJson(json['data']['${i}']));
+        }
+      }
+    } catch (e) {
+      print('catch $e');
+    }
   }
 }

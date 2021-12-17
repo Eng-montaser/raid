@@ -53,6 +53,11 @@ class GetService extends BaseApi {
     return await api.httpGet('services');
   }
 
+  Future<http.Response> getMobiles(String search, int page) async {
+    return await api
+        .httpGet('services', query: {"search": "$search", 'page': '$page'});
+  }
+
   Future<http.Response> getSetting() async {
     return await api.httpGet('settings');
   }
@@ -136,5 +141,18 @@ class GetService extends BaseApi {
 
   Future<http.Response> getWarehousesData() async {
     return await api.httpGet('warehouses');
+  }
+
+  Future<http.Response> getCompanies() async {
+    return await api.httpGet('companies');
+  }
+
+  Future<http.Response> getCodCat() async {
+    return await api.httpGet('code_categories');
+  }
+
+  Future<http.Response> getCompanyCodCat(int com, int cat) async {
+    return await api
+        .httpGet('codes', query: {"category_id": "$cat", "company_id": "$com"});
   }
 }

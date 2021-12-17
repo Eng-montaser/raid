@@ -7,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -110,7 +111,7 @@ class _SearchPageState extends State<PreviewPage> {
     return val;
   }
 
-  Future<void> share() async {
+  /*Future<void> share() async {
     bool isinstalled = await isInstalled();
     if (isinstalled)
       await WhatsappShare.share(
@@ -118,7 +119,7 @@ class _SearchPageState extends State<PreviewPage> {
         linkUrl: 'https://flutter.dev/',
         phone: '+201102490707',
       );
-  }
+  }*/
 
   @override
   void dispose() {
@@ -126,6 +127,7 @@ class _SearchPageState extends State<PreviewPage> {
   }
 
   Future<void> shareFile(File file) async {
+    // FlutterOpenWhatsapp.sendSingleMessage("+201113985706", file.path);
     await WhatsappShare.shareFile(
       text: 'فاتورة شراء',
       phone: '911234567890',
@@ -401,8 +403,63 @@ class _SearchPageState extends State<PreviewPage> {
                                 'sale_note': '',
                                 'staff_note': ''
                               };
-                              if ((paymentIndex == 2 || paymentIndex == 3) &&
-                                  paymentCOntroller.text.isNotEmpty)
+                              if (paymentIndex == 2 || paymentIndex == 3) {
+                                if (paymentCOntroller.text.isNotEmpty)
+                                  await Provider.of<PostProvider>(context,
+                                          listen: false)
+                                      .addsale(data)
+                                      .then((value) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                    if (value != null) {
+                                      AwesomeDialog(
+                                          context: context,
+                                          animType: AnimType.LEFTSLIDE,
+                                          headerAnimationLoop: false,
+                                          dialogType: DialogType.SUCCES,
+                                          dismissOnBackKeyPress: false,
+                                          dismissOnTouchOutside: false,
+                                          title: 'اصدار فاتورة',
+                                          desc: 'تم الاصدار بنجاح',
+                                          btnOkText: "مشاركة",
+                                          btnOkIcon: FontAwesomeIcons.whatsapp,
+                                          btnOkColor: Colors.lightGreen,
+                                          btnOkOnPress: () {
+                                            billPrint(value['invoice']['id']);
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SalesPerson()),
+                                                    (Route<dynamic> route) =>
+                                                        false);
+                                          },
+                                          btnCancelText: 'إنهاء',
+                                          btnCancelColor: Colors.redAccent,
+                                          btnCancelOnPress: () {
+                                            Navigator.of(context)
+                                                .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SalesPerson()),
+                                                    (Route<dynamic> route) =>
+                                                        false);
+                                          },
+                                          onDissmissCallback: (type) {})
+                                        ..show();
+                                    } else
+                                      showMessage(context, 'اصدار فاتورة',
+                                          "فشل فى تسجيل الفاتورة", false);
+                                  });
+                                else {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  showMessage(context, 'اصدار فاتورة',
+                                      "ادخل المبلغ المدفوع", false);
+                                }
+                              } else
                                 await Provider.of<PostProvider>(context,
                                         listen: false)
                                     .addsale(data)
@@ -452,13 +509,7 @@ class _SearchPageState extends State<PreviewPage> {
                                     showMessage(context, 'اصدار فاتورة',
                                         "فشل فى تسجيل الفاتورة", false);
                                 });
-                              else {
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                showMessage(context, 'اصدار فاتورة',
-                                    "ادخل المبلغ المدفوع", false);
-                              }
+
                               //else
                             },
                             child: Container(

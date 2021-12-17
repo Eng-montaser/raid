@@ -65,8 +65,7 @@ class _HomePageState extends State<Invoice> {
   updateTotal() {
     total = 0;
     for (var c in cart) {
-      total = total + (c.product.price * c.qty);
-      print('${c.qty}');
+      total = total + c.subtotal;
     }
     if (shippingController.text.isNotEmpty &&
         !shippingController.text.contains('-')) {
@@ -287,7 +286,10 @@ class _HomePageState extends State<Invoice> {
                           _productEditingController.text = '';
                         });
                         if (suggestion.price != null)
-                          await cart.add(CartItem(product: suggestion, qty: 1));
+                          await cart.add(CartItem(
+                              product: suggestion,
+                              qty: 1,
+                              subtotal: suggestion.price));
 
                         productData.remove(suggestion);
                         updateTotal();
@@ -439,8 +441,9 @@ class _HomePageState extends State<Invoice> {
       return ShoppingCartRow(
         product: e.product,
         quantity: qty,
-        onChangeQuantity: (val) {
-          e.setCart(double.parse('$val'));
+        onChange: (qty, subtotal) {
+          e.setCart(double.parse('$qty'));
+          e.setSubTotal(double.parse('$subtotal'));
           updateTotal();
         },
         onRemove: () async {

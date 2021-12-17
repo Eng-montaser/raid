@@ -11,9 +11,9 @@ import 'package:raid/ui/Profile/CustomerProfile.dart';
 import 'package:raid/widget/CustomWidgets.dart';
 
 import '../constants.dart';
-import 'HomeTaps/Codes/Code.dart';
+import 'HomeTaps/Codes/Code2.dart';
 import 'HomeTaps/Conciliation/Conciliation.dart';
-import 'HomeTaps/MyServices/MyServices.dart';
+import 'HomeTaps/MyServices/SearchPage.dart';
 import 'HomeTaps/Offers/Offers.dart';
 import 'HomeTaps/ProductsScreen/ProductsScreen.dart';
 import 'HomeTaps/Videos/Video.dart';
@@ -59,7 +59,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //   await Provider.of<GetProvider>(context, listen: false).getVideos();
 
       ///Cat And Codes --------------------------------------
-      await Provider.of<GetProvider>(context, listen: false).getCodes();
+      await Provider.of<GetProvider>(context, listen: false).getCompanies();
 
       ///Cat And Setting --------------------------------------
       await Provider.of<GetProvider>(context, listen: false).getSetting();
@@ -162,7 +162,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             text: "Offers".tr(),
                           ),
                           Tab(
-                            text: "MyServices".tr(),
+                            text: "myservices".tr(),
                           ),
                           Tab(
                             text: "Video".tr(),
@@ -202,9 +202,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ConciliationScreen(),
             BrandsScreen(),
             OffersScreen(),
-            MyServicesScreen(),
+            SearchServices(),
             VideoScreen(),
-            CodeScreen(),
+            CodeScreen2(),
             ContactUs()
           ],
         ));
