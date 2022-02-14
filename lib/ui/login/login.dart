@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
@@ -90,12 +91,46 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
         SizedBox(
           height: ScreenUtil().setHeight(16),
         ),
-        CustomTextInput(
-          hintText: 'البريد الالكترونى',
-          leading: Icons.person_outline,
-          controller: _emailController,
-          focusNode:
-              _loginValidate == 1 || _loginValidate == 2 ? focusNode : null,
+        Container(
+          margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Color(0xfff1f1f1), width: 2),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(10)),
+          width: MediaQuery.of(context).size.width * 0.70,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                "assets/images/egy.png",
+                fit: BoxFit.contain,
+                height: ScreenUtil().setHeight(30),
+                width: ScreenUtil().setWidth(50),
+              ),
+              Text(
+                'مصر   ',
+                style: FCITextStyle().bold16(),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.40,
+                child: TextField(
+                  maxLength: 14,
+                  //  leading: Icons.phone_enabled_outlined,
+                  controller: _emailController,
+                  keyboardType: TextInputType.phone,
+                  focusNode: _loginValidate == 1 || _loginValidate == 2
+                      ? focusNode
+                      : null,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'رقم التليفون',
+                      counterText: ""),
+                ),
+              ),
+            ],
+          ),
         ),
         SizedBox(
           height: ScreenUtil().setHeight(10),
@@ -131,7 +166,8 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                   .login(authenticationData)
                   .then((value) {
                 if (value.success) {
-                  if (widget.userType == UserType.salesPerson)
+                  if (widget.userType == UserType.salesPerson &&
+                      value.data.role_id < 5)
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => SalesPerson()),
                         (Route<dynamic> route) => false);
@@ -160,10 +196,10 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
       _showScaffold('برجاء ادخال بيانات تسجيل الدخول');
       return 1;
     }
-    if (emailIsValid(_emailController.text)) {
+    if (_emailController.text.length < 11) {
       focusNode = new FocusNode();
       focusNode.requestFocus();
-      _showScaffold('برجاء ادخال بريد الكترونى صحيح');
+      _showScaffold('برجاء ادخال رقم تليفون صحيح');
       return 2;
     }
     if (_passwordController.text.isEmpty) {

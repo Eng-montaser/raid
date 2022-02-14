@@ -65,16 +65,55 @@ class _OnBoard extends State<OnBoard> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   RoundedButton(
-                    onTap: () {
-                      Navigator.of(context).pushNamed('ourservice');
-                      /*  authProvider.setUserDataFromCache().then((response) {
-                        if(response)
+                    onTap: () async {
+                      /* try {
+                        SimData simData = await SimDataPlugin.getSimData();
+                        for (var s in simData.cards) {
+                          print('Serial numbers: ${s.displayName}');
+                        }
+                      } on PlatformException catch (e) {
+                        debugPrint(
+                            "error! code: ${e.code} - message: ${e.message}");
+                      }
+                      if (await Permission.phone.request().isGranted) {
+                        int subscriptionId = 1; // sim card subscription ID
+                        String code = "*947#"; // ussd code payload
+                        try {
+                          String ussdResponseMessage =
+                              await UssdService.makeRequest(
+                            subscriptionId,
+                            code,
+                            Duration(
+                                seconds:
+                                    5), // timeout (optional) - default is 10 seconds
+                          );
+                          print("succes! message: $ussdResponseMessage");
+                        } catch (e) {
+                          print(
+                              "error! code: ${e.code} - message: ${e.message}");
+                        }
+                      } else {
+                        print("Denieds: ");
+
+                        // We didn't ask for permission yet or the permission has been denied before but not permanently.
+                      }
+
+                      if (await canLaunch("tel:" +
+                          Uri.encodeComponent(removeAllHtmlTags('*123#')))) {
+                        await launch("tel:" +
+                            Uri.encodeComponent(removeAllHtmlTags('*123#')));
+                      }*/
+                      authProvider.setUserDataFromCache().then((response) {
+                        if (response != null)
                           Navigator.of(context).pushNamed('ourservice');
                         else
                           Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => AuthPage(userType: UserType.customer,)));
-                      });*/
+                              MaterialPageRoute(
+                                  builder: (context) => AuthPage(
+                                        userType: UserType.customer,
+                                      )));
+                      });
                     },
                     color: Color(0xffff0d0d),
                     text: ' الدخول كعميل',
@@ -82,9 +121,12 @@ class _OnBoard extends State<OnBoard> {
                   RoundedButton(
                     onTap: () {
                       authProvider.setUserDataFromCache().then((response) {
-                        if (response)
-                          Navigator.of(context).pushNamed('sales_person');
-                        else
+                        if (response != null) {
+                          if (response.role_id < 5)
+                            Navigator.of(context).pushNamed('sales_person');
+                          else
+                            Navigator.of(context).pushNamed('ourservice');
+                        } else
                           Navigator.push(
                               context,
                               MaterialPageRoute(

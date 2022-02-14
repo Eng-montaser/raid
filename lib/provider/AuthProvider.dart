@@ -1,43 +1,31 @@
-
 import 'dart:convert';
 
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:raid/model/BrandData.dart';
-import 'package:raid/model/CodeData.dart';
-import 'package:raid/model/ConciliationData.dart';
-import 'package:raid/model/Customers.dart';
-import 'package:raid/model/ProductData.dart';
-import 'package:raid/model/SercicesData.dart';
-import 'package:raid/model/SettingData.dart';
-import 'package:raid/model/VideoData.dart';
+import 'package:raid/model/UserData.dart';
 import 'package:raid/provider/base_provider.dart';
 import 'package:raid/service/GetService.dart';
 import 'package:raid/service/PostService.dart';
-import 'package:raid/service/api.dart';
-import 'package:raid/model/UserData.dart';
 
 import 'CasheManger.dart';
 
 class AuthProvider extends BaseProvider {
   GetService _getService = GetService();
-  PostService _postService=PostService();
+  PostService _postService = PostService();
 
   ///Cat And Products -------------------------------------
- UserData _userData =new UserData();
-  UserData get userData  => _userData;
+  UserData _userData = new UserData();
+  UserData get userData => _userData;
 
-  Future<bool> setUserDataFromCache()async{
-    bool result;
-   await  CacheManger().getData(CacheType.userData).then((value){
-      if(value.token!=null) {
-        _userData=value;
-        result= true;
-      }else{
-        result=false;
+  Future<UserData> setUserDataFromCache() async {
+    UserData result;
+    await CacheManger().getData(CacheType.userData).then((value) {
+      if (value.token != null) {
+        _userData = value;
+        result = value;
       }
     });
     return result;
   }
+
 //  Future<AuthenticationResult> register(AuthenticationData authenticationData) async {
 //    AuthenticationResult authenticationResult;
 //    setBusy(true);
@@ -78,21 +66,23 @@ class AuthProvider extends BaseProvider {
       var response = await _postService.register(authenticationData);
       print(response.statusCode);
       var data = jsonDecode(response.body);
-      print("Register Body :$data");
-      if (response.statusCode == 200){
+      if (response.statusCode == 200) {
         _userData = UserData.fromLoginJson(data);
         authenticationResult = AuthenticationResult(
-            success: true, message: 'تم تسجيل الدخول بنجاح', data: _userData);
+            success: true,
+            message:
+                'تم التسجيل بنجاح يرجي العلم بانه سيتم ارسال طلب التسجيل للادارة لتفعيله',
+            data: _userData);
         await CacheManger().saveData(CacheType.userData, _userData);
         notifyListeners();
         setBusy(false);
-      }else {
-        if(data["message"]!=null) {
+      } else {
+        if (data["message"] != null) {
           authenticationResult = AuthenticationResult(
             success: false,
             message: "${data["message"]}\n ${data["errors"]}",
           );
-        }else{
+        } else {
           authenticationResult = AuthenticationResult(
             success: false,
             message: "هناك خطا فى تسجيل الدخول",
@@ -110,6 +100,7 @@ class AuthProvider extends BaseProvider {
     setBusy(false);
     return authenticationResult;
   }
+
   Future<AuthenticationResult> login(
       AuthenticationData authenticationData) async {
     AuthenticationResult authenticationResult;
@@ -123,17 +114,17 @@ class AuthProvider extends BaseProvider {
       if (response.statusCode == 200) {
         _userData = UserData.fromLoginJson(data);
         authenticationResult = new AuthenticationResult(
-            success: true, message:"تم تسجيل الدخول بنجاح", data: _userData);
+            success: true, message: "تم تسجيل الدخول بنجاح", data: _userData);
         await CacheManger().saveData(CacheType.userData, _userData);
         notifyListeners();
         setBusy(false);
       } else {
-        if(data["message"]!=null) {
+        if (data["message"] != null) {
           authenticationResult = AuthenticationResult(
             success: false,
             message: "${data["message"]}\n ${data["errors"]}",
           );
-        }else{
+        } else {
           authenticationResult = AuthenticationResult(
             success: false,
             message: "هناك خطا فى تسجيل الدخول",
@@ -151,6 +142,7 @@ class AuthProvider extends BaseProvider {
     setBusy(false);
     return authenticationResult;
   }
+
 //  Future<AuthenticationResult> login( AuthenticationData authenticationData )async {
 //    AuthenticationResult authenticationResult;
 //    setBusy(true);
@@ -202,6 +194,7 @@ class AuthProvider extends BaseProvider {
     setBusy(false);
     return _userData;
   }
+
   Future<AuthenticationResult> updateUserData(authenticationData) async {
     AuthenticationResult authenticationResult;
     setBusy(true);
@@ -213,23 +206,20 @@ class AuthProvider extends BaseProvider {
       print(data);
       if (response.statusCode == 200) {
         _userData.updateUserData(data);
-        authenticationResult=new AuthenticationResult(
-            success: true,
-            message: 'Success',
-            data:  _userData
-        );
+        authenticationResult = new AuthenticationResult(
+            success: true, message: 'Success', data: _userData);
         CacheManger().saveData(CacheType.userData, _userData);
         notifyListeners();
         setBusy(false);
-      }else{
-        authenticationResult=AuthenticationResult(
+      } else {
+        authenticationResult = AuthenticationResult(
           success: false,
           message: 'Fail',
         );
       }
     } catch (e) {
       print(e);
-      authenticationResult=AuthenticationResult(
+      authenticationResult = AuthenticationResult(
         success: false,
         message: 'Fail',
       );

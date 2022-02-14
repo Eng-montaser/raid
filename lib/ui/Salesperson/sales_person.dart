@@ -93,8 +93,9 @@ class _SalesPerson extends State<SalesPerson> {
                               .copyWith(height: 1.5),
                         ),
                       ),
-                      cardWidget('كشف حساب العملاء',
-                          'assets/images/Group_498.png', false, 'summary', 0),
+                      if (userData?.role_id < 5)
+                        cardWidget('كشف حساب العملاء',
+                            'assets/images/Group_498.png', false, 'summary', 0),
                       if (userData?.role_id == 1)
                         cardWidget('فاتورة شراء', 'assets/images/Group_498.png',
                             true, 'buy', 50),

@@ -47,6 +47,10 @@ dependencies:
   flutter_open_whatsapp: ^0.1.2
   url_launcher: ^6.0.10
   pdf: ^3.6.2
+  #getx 3.26.0
+  #ussd_service: ^0.1.1
+  #permission_handler: ^8.1.6
+  #sim_data: ^0.0.2
   whatsapp_share: ^1.1.1
   #scroll_to_index: ^2.1.0
   #hardware_buttons: ^1.0.0

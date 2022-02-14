@@ -74,6 +74,23 @@ class AuthenticationResult {
       ..show();
   }
 
+  successRegMessage(context, String msg) {
+    AwesomeDialog(
+        context: context,
+        animType: AnimType.LEFTSLIDE,
+        headerAnimationLoop: false,
+        dialogType: DialogType.SUCCES,
+        dismissOnBackKeyPress: false,
+        dismissOnTouchOutside: false,
+        title: "تسجيل مستخدم",
+        desc: msg,
+        btnOkText: "حسنا",
+        btnOkColor: Colors.red,
+        btnOkOnPress: () {},
+        onDissmissCallback: (type) {})
+      ..show();
+  }
+
   failMessage(context, message) {
     AwesomeDialog(
         context: context,

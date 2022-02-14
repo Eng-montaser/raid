@@ -81,7 +81,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               width: ScreenUtil().setWidth(100),
               child: Image.asset(
                 kLogo,
-                fit: BoxFit.fill,
+                fit: BoxFit.contain,
               ),
               margin: EdgeInsets.symmetric(
                   horizontal: ScreenUtil().setWidth(20),

@@ -1,17 +1,17 @@
 import 'dart:async';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:raid/constants.dart';
 import 'package:raid/model/UserData.dart';
 import 'package:raid/provider/AuthProvider.dart';
 import 'package:raid/style/FCITextStyles.dart';
-import 'package:raid/ui/Salesperson/sales_person.dart';
+import 'package:raid/ui/auth_page.dart';
 import 'package:raid/widget/button_animated.dart';
 import 'package:raid/widget/rounded_input_field.dart';
-
-import '../our_service.dart';
 
 class SignUp extends StatefulWidget {
   final GlobalKey<ScaffoldState> registerScaffoldKey;
@@ -90,7 +90,7 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
           style: FCITextStyle(color: Colors.white).bold18(),
         ),
         SizedBox(
-          height: ScreenUtil().setHeight(16),
+          height: ScreenUtil().setHeight(0),
         ),
         CustomTextInput(
           hintText: 'اسم المستخدم',
@@ -98,14 +98,55 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
           controller: _usernameController,
           focusNode: _registerValidate == 1 ? focusNode : null,
         ),
-        CustomTextInput(
+        Container(
+          margin: EdgeInsets.symmetric(vertical: ScreenUtil().setHeight(5)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Color(0xfff1f1f1), width: 2),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(10)),
+          width: MediaQuery.of(context).size.width * 0.70,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                "assets/images/egy.png",
+                fit: BoxFit.contain,
+                height: ScreenUtil().setHeight(30),
+                width: ScreenUtil().setWidth(50),
+              ),
+              Text(
+                'مصر   ',
+                style: FCITextStyle().bold16(),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.40,
+                child: TextField(
+                  maxLength: 14,
+                  //  leading: Icons.phone_enabled_outlined,
+                  controller: _emailController,
+                  keyboardType: TextInputType.phone,
+                  focusNode: _registerValidate == 2 || _registerValidate == 3
+                      ? focusNode
+                      : null,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'رقم التليفون',
+                      counterText: ""),
+                ),
+              ),
+            ],
+          ),
+        ),
+        /*CustomTextInput(
           hintText: 'الايميل',
           leading: Icons.email,
           controller: _emailController,
           focusNode: _registerValidate == 2 || _registerValidate == 3
               ? focusNode
               : null,
-        ),
+        ),*/
         CustomTextInput(
           hintText: 'كلمة السر',
           leading: Icons.lock_outline,
@@ -123,7 +164,10 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
               : null,
         ),
         SizedBox(
-          height: ScreenUtil().setHeight(24),
+          height: ScreenUtil().setHeight(10),
+        ),
+        SizedBox(
+          height: ScreenUtil().setHeight(10),
         ),
         StaggerAnimation(
           titleButton: 'تسجيل',
@@ -144,14 +188,39 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
                   .register(authenticationData)
                   .then((value) {
                 if (value.success) {
-                  if (widget.userType == UserType.salesPerson)
-                    Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => SalesPerson()),
-                        (Route<dynamic> route) => false);
+                  AwesomeDialog(
+                      context: context,
+                      animType: AnimType.LEFTSLIDE,
+                      headerAnimationLoop: false,
+                      dialogType: DialogType.SUCCES,
+                      dismissOnBackKeyPress: false,
+                      dismissOnTouchOutside: false,
+                      title: "تسجيل مستخدم",
+                      desc: value.message,
+                      btnOkText: "حسنا",
+                      btnOkColor: Colors.red,
+                      btnOkOnPress: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    AuthPage(userType: widget.userType)));
+                      },
+                      onDissmissCallback: (type) {})
+                    ..show();
+                  /*if (widget.userType == UserType.salesPerson)
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                AuthPage(userType: UserType.salesPerson)));
+//                    Navigator.of(context).pushAndRemoveUntil(
+//                        MaterialPageRoute(builder: (context) => SalesPerson()),
+//                        (Route<dynamic> route) => false);
                   else
                     Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => OurService()),
-                        (Route<dynamic> route) => false);
+                        (Route<dynamic> route) => false);*/
                 } else
                   value.failMessage(context, value.message);
               });
@@ -179,12 +248,11 @@ class _SignUpState extends State<SignUp> with TickerProviderStateMixin {
       _showScaffold('برجاء ادخال بيانات تسجيل الدخول');
       return 2;
     }
-    if (emailIsValid(_emailController.text)) {
+    if (_emailController.text.length < 11) {
       focusNode = new FocusNode();
-
       focusNode.requestFocus();
-      _showScaffold('برجاء ادخال بريد الكترونى صحيح');
-      return 3;
+      _showScaffold('برجاء ادخال رقم تليفون صحيح');
+      return 2;
     }
     if (_passwordController.text.isEmpty) {
       focusNode = new FocusNode();

@@ -133,11 +133,11 @@ class _ConcSearch extends State<CodeSearch> {
                                     InkWell(
                                       onTap: () async {
                                         if (await canLaunch(
-                                            "tel:${removeAllHtmlTags(searchCodes[index].description)}")) {
+                                            "tel:${Uri.encodeComponent(removeAllHtmlTags(searchCodes[index].title.split('').reversed.join()))}")) {
                                           await launch(
-                                              "${removeAllHtmlTags(searchCodes[index].description)}");
+                                              "tel:${Uri.encodeComponent(removeAllHtmlTags(searchCodes[index].title.split('').reversed.join()))}");
                                         } else {
-                                          throw 'Could not launch ${removeAllHtmlTags(searchCodes[index].description)}';
+                                          throw 'Could not launch ${removeAllHtmlTags(searchCodes[index].title)}';
                                         }
                                       },
                                       child: Container(
