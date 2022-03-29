@@ -245,7 +245,7 @@ class _ConcSearch extends State<CodeSearch> {
             style: FCITextStyle(color: primaryColor).normal18().copyWith(),
             onTap: () {
               setState(() {
-                _codeEditingController.text = '';
+                 _codeEditingController.text = '';
               });
             },
             decoration: InputDecoration(

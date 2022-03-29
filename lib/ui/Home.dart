@@ -126,21 +126,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               child: Builder(builder: (context) {
                 return Row(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
+                    if (_tabController.index != 0)
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          if (_tabController.index > 0) {
+                            _tabController.animateTo(_tabController.index - 1);
+                          }
+                        },
                       ),
-                      onPressed: () {
-                        if (_tabController.index > 0) {
-                          _tabController.animateTo(_tabController.index - 1);
-                        }
-                      },
-                    ),
                     Expanded(
                       child: TabBar(
                         controller: _tabController,
                         indicatorColor: Colors.red,
+
 //            indicatorWeight: 0,
                         isScrollable: true,
                         unselectedLabelStyle: TextStyle(fontSize: 18),
@@ -150,43 +152,44 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             fontSize: 18),
                         tabs: [
                           Tab(
-                            text: "Products".tr(),
+                            child: Text("Products".tr()),
                           ),
                           Tab(
-                            text: "Conciliation".tr(),
+                            child: Text("Conciliation".tr()),
                           ),
                           Tab(
-                            text: "Brands".tr(),
+                            child: Text("Brands".tr()),
                           ),
                           Tab(
-                            text: "Offers".tr(),
+                            child: Text("Offers".tr()),
                           ),
                           Tab(
-                            text: "myservices".tr(),
+                            child: Text("myservices".tr()),
                           ),
                           Tab(
-                            text: "Video".tr(),
+                            child: Text("Video".tr()),
                           ),
                           Tab(
-                            text: "Code".tr(),
+                            child: Text("Code".tr()),
                           ),
                           Tab(
-                            text: "ContactUs".tr(),
+                            child: Text("ContactUs".tr()),
                           )
                         ],
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
+                    if (_tabController.index != 7)
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          if (_tabController.index < 7) {
+                            _tabController.animateTo(_tabController.index + 1);
+                          }
+                        },
                       ),
-                      onPressed: () {
-                        if (_tabController.index + 1 < 7) {
-                          _tabController.animateTo(_tabController.index + 1);
-                        }
-                      },
-                    ),
                   ],
                 );
               }),
